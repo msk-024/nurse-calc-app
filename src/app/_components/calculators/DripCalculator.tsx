@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { saveHistory } from "@/lib/history";
+import LabeledInput from "../LabeledInput";
+import LabeledSelect from "../LabeledSelect";
+import SubmitButton from "../SubmitButton";
+import { ResultBox } from "../ResultBox";
 
 export default function DripCalculator() {
   const [volume, setVolume] = useState("");
@@ -51,71 +55,46 @@ export default function DripCalculator() {
 
       {/* 入力フォーム */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            総輸液量 (mL)
-          </label>
-          <input
-            type="number"
-            value={volume}
-            onChange={(e) => setVolume(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="500"
-          />
-        </div>
+        <LabeledInput
+          label="総輸液量 (mL)"
+          type="number"
+          value={volume}
+          onChange={(e) => setVolume(e.target.value)}
+          placeholder="500"
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            投与時間 (時間)
-          </label>
-          <input
-            type="number"
-            value={hours}
-            onChange={(e) => setHours(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="8"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">滴下係数</label>
-          <select
-            value={dropFactor}
-            onChange={(e) => setDropFactor(e.target.value)}
-            className="w-full p-2 border rounded"
-          >
-            <option value="10">10 滴/mL</option>
-            <option value="15">15 滴/mL</option>
-            <option value="20">20 滴/mL</option>
-            <option value="60">60 滴/mL</option>
-          </select>
-        </div>
+        <LabeledInput
+          label="投与時間 (時間)"
+          type="number"
+          value={hours}
+          onChange={(e) => setHours(e.target.value)}
+          placeholder="8"
+        />
+        <LabeledSelect
+          label="滴下係数"
+          value={dropFactor}
+          onChange={(e) => setDropFactor(e.target.value)}
+          options={[
+            { value: "10", label: "10 滴/mL" },
+            { value: "15", label: "15 滴/mL" },
+            { value: "20", label: "20 滴/mL" },
+            { value: "60", label: "60 滴/mL" },
+          ]}
+        />
       </div>
 
       {/* 計算ボタン */}
-      <button
-        onClick={calculate}
-        className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 transition"
-      >
-        計算する
-      </button>
+      <SubmitButton onClick={calculate} color="bg-green-500" />
 
       {/* 結果表示 */}
       {result && (
-        <div className="bg-green-50 border border-green-200 rounded p-4">
-          <h3 className="font-semibold text-green-800">計算結果</h3>
-          <p>
-            輸液速度:{" "}
-            <span className="font-bold">{result.mlPerHour} mL/時</span>
-          </p>
-          <p>
-            滴下数:{" "}
-            <span className="font-bold">{result.dropsPerMin} 滴/分</span>
-          </p>
-          <p className="text-xs text-green-600 mt-2">
-            ※ 実際の滴下数は15秒間の滴下数×4で確認してください
-          </p>
-        </div>
+        <ResultBox
+          color="green"
+          results={[
+            { label: "輸液速度", value: result.mlPerHour, unit: "mL/時" },
+            { label: "滴下数", value: result.dropsPerMin, unit: "滴/分" },
+          ]}
+        />
       )}
     </div>
   );

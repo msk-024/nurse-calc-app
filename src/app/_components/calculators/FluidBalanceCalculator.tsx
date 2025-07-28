@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { saveHistory } from "@/lib/history";
+import LabeledInput from "../LabeledInput";
+import SubmitButton from "../SubmitButton";
+import { ResultBox } from "../ResultBox";
 
 export default function FluidBalanceCalculator() {
   const [prevWeight, setPrevWeight] = useState("");
@@ -68,93 +71,71 @@ export default function FluidBalanceCalculator() {
 
       {/* 体重 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            前日体重 (kg)
-          </label>
-          <input
-            value={prevWeight}
-            onChange={(e) => setPrevWeight(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            当日体重 (kg)
-          </label>
-          <input
-            value={currWeight}
-            onChange={(e) => setCurrWeight(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
+        <LabeledInput
+          label="前日体重 (kg)"
+          type="number"
+          value={prevWeight}
+          onChange={(e) => setPrevWeight(e.target.value)}
+          placeholder="例: 60"
+        />
+        <LabeledInput
+          label="当日体重 (kg)"
+          type="number"
+          value={currWeight}
+          onChange={(e) => setCurrWeight(e.target.value)}
+          placeholder="例: 60.5"
+        />
       </div>
 
       {/* 摂取量 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            経口摂取 (mL)
-          </label>
-          <input
-            value={oralIntake}
-            onChange={(e) => setOralIntake(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">輸液量 (mL)</label>
-          <input
-            value={ivIntake}
-            onChange={(e) => setIvIntake(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
+        <LabeledInput
+          label="経口摂取 (mL)"
+          type="number"
+          value={oralIntake}
+          onChange={(e) => setOralIntake(e.target.value)}
+          placeholder="例: 1200"
+        />
+        <LabeledInput
+          label="輸液量 (mL)"
+          type="number"
+          value={ivIntake}
+          onChange={(e) => setIvIntake(e.target.value)}
+          placeholder="例: 500"
+        />
       </div>
 
       {/* 排出量 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">尿量 (mL)</label>
-          <input
-            value={urineOutput}
-            onChange={(e) => setUrineOutput(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            その他排泄 (mL)
-          </label>
-          <input
-            value={otherOutput}
-            onChange={(e) => setOtherOutput(e.target.value)}
-            className="w-full border rounded p-2"
-          />
-        </div>
+        <LabeledInput
+          label="尿量 (mL)"
+          type="number"
+          value={urineOutput}
+          onChange={(e) => setUrineOutput(e.target.value)}
+          placeholder="例: 1000"
+        />
+        <LabeledInput
+          label="その他排泄 (mL)"
+          type="number"
+          value={otherOutput}
+          onChange={(e) => setOtherOutput(e.target.value)}
+          placeholder="例: 200"
+        />
       </div>
 
       {/* 計算ボタン */}
-      <button
-        onClick={calculate}
-        className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
-      >
-        計算する
-      </button>
+      <SubmitButton onClick={calculate} color="bg-orange-500" />
 
       {result && (
-        <div className="p-4 bg-orange-50 border border-orange-200 rounded">
-          <p>
-            ✅ <strong>体重変化:</strong> {result.weightChange} kg
-          </p>
-          <p>
-            ✅ <strong>水分バランス:</strong> {result.fluidBalance} mL
-          </p>
-          <p>
-            ✅ <strong>推定体液変動:</strong> {result.estimatedFluid} mL
-          </p>
-          <p className="text-orange-700 font-bold">{result.status}</p>
-        </div>
+        <ResultBox
+          color="orange"
+          results={[
+            { label: "体重変化", value: result.weightChange, unit: "kg" },
+            { label: "水分バランス", value: result.fluidBalance, unit: "mL" },
+            { label: "推定体液変動", value: result.estimatedFluid, unit: "mL" },
+            { label: "評価", value: result.status, unit: "" },
+          ]}
+        />
       )}
     </div>
   );

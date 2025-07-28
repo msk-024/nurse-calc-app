@@ -15,7 +15,12 @@ export default function HistoryList({ items }: HistoryListProps) {
         return (
           <div key={item.id} className="flex items-center gap-2">
             {calc && (
-              <Image src={calc.iconPath} alt={calc.name} width={20} height={20} />
+              <Image
+                src={calc.iconPath}
+                alt={calc.name}
+                width={20}
+                height={20}
+              />
             )}
             <div>
               <p className="font-semibold">{calc?.name ?? "不明な計算"}</p>

@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🩺 看護師向け計算ツールアプリ（nurse-calc-app）
 
-## Getting Started
+看護師業務でよく使われる **薬剤計算・点滴速度・体液バランス** などの計算を、スマートに行えるWebアプリです。
+スマートフォンでも使いやすいUIで、忙しい現場でもすぐ使えることを目指しています。
 
-First, run the development server:
+<!-- スクリーンショットを追加予定 -->
+<!-- ![screenshot](public/images/screenshot.png) -->
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 主な特徴
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- ✅ シンプルで見やすいインターフェース  
+- ✅ 複数の計算機能に対応（投薬計算・点滴速度・体液バランスなど）  
+- ✅ 履歴保存（各カテゴリ最大10件）  
+- ✅ PWA対応予定（オフライン使用可）  
+- ✅ ログイン不要、すぐ使える  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠 使用技術スタック
 
-To learn more about Next.js, take a look at the following resources:
+| 分類         | 技術                       |
+|--------------|----------------------------|
+| フロントエンド | Next.js 14（App Router）   |
+| スタイリング   | Tailwind CSS v3           |
+| 言語         | TypeScript                 |
+| 状態管理     | React Hooks（useStateなど）|
+| データ保存   | LocalStorage               |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧮 実装済みの計算機能
 
-## Deploy on Vercel
+- [x] 投薬計算  
+- [x] 点滴速度計算  
+- [x] 体液バランス計算  
+- [ ] 体表面積（BSA）計算 ← **実装予定**  
+- [ ] 栄養計算（kcal・たんぱく量） ← **実装予定**  
+- [ ] 電解質補正・輸血量・BMIなど ← **段階的に追加予定**  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

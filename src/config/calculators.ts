@@ -19,6 +19,12 @@ export const calculators: CalculatorType[] = [
     iconPath: "/icons/scale-unbalanced.svg",
     color: "bg-orange-500",
   },
+  {
+    id: "bsa",
+    name: "体表面積",
+    iconPath: "/icons/body.svg",
+    color: "bg-purple-500",
+  },
   // 追加予定
 ];
 

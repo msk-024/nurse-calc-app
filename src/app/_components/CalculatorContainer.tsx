@@ -1,6 +1,8 @@
 import MedicationCalculator from "./calculators/MedicationCalculator";
 import DripCalculator from "./calculators/DripCalculator";
 import FluidBalanceCalculator from "./calculators/FluidBalanceCalculator";
+import BsaCalculator from "./calculators/BsaCalculator";
+
 
 export default function CalculatorContainer({
   activeCalc,
@@ -14,6 +16,8 @@ export default function CalculatorContainer({
       return <DripCalculator />;
     case "fluid":
       return <FluidBalanceCalculator />;
+    case "bsa":
+      return <BsaCalculator />;
     default:
       return <div>準備中...</div>;
   }

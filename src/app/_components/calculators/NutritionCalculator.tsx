@@ -1,3 +1,4 @@
+// 栄養計算
 "use client";
 
 import { useState } from "react";
@@ -8,6 +9,7 @@ import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { patientConditions } from "@/config/patientConditions";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");
@@ -65,28 +67,30 @@ export default function NutritionCalculator() {
           label="患者の状態"
           value={condition}
           onChange={(e) => setCondition(e.target.value as PatientCondition)}
-          options={[
-            { value: "normal", label: "通常成人" },
-            { value: "elderly", label: "高齢者" },
-            { value: "bedsore", label: "褥瘡あり" },
-            { value: "postoperative", label: "術後" },
-            { value: "burn", label: "熱傷" },
-            { value: "critical", label: "重症" },
-          ]}
+          options={patientConditions}
         />
       </div>
 
-      <SubmitButton onClick={calculate} color="bg-purple-500" />
+      <SubmitButton onClick={calculate} color="bg-amber-500" />
 
       {result && (
-        <ResultBox
-          color="purple"
-          results={[
-            { label: "エネルギー", value: result.calorie, unit: "kcal" },
-            { label: "タンパク質", value: result.protein, unit: "g" },
-            { label: "水分量", value: result.water, unit: "mL" },
-          ]}
-        />
+        <>
+          <ResultBox
+            color="amber"
+            results={[
+              { label: "エネルギー", value: result.calorie, unit: "kcal" },
+              { label: "タンパク質", value: result.protein, unit: "g" },
+              { label: "水分量", value: result.water, unit: "mL" },
+            ]}
+            note="※ 推定値です。実際の栄養管理は医師・栄養士の指示に従ってください。"
+          />
+          {(condition === "burn" || condition === "critical") && (
+            <p className="text-sm text-red-600">
+              ※ 注意：{condition === "burn" ? "熱傷" : "重症"}患者では
+              状態に応じた調整が必要です。
+            </p>
+          )}
+        </>
       )}
     </div>
   );

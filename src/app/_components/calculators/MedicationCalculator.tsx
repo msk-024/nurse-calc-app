@@ -74,11 +74,11 @@ export default function MedicationCalculator() {
         />
       </div>
 
-      <SubmitButton onClick={calculate} color="bg-blue-500" />
+      <SubmitButton onClick={calculate} color="bg-yellow-500" />
 
       {result && (
         <ResultBox
-          color="blue"
+          color="yellow"
           results={[
             { label: "総投与量", value: result.totalDose, unit: "mg" },
             { label: "薬液量", value: result.volume, unit: "mL" },

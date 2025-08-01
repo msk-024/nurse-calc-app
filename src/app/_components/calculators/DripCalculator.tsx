@@ -1,3 +1,4 @@
+// 点滴計算
 "use client";
 
 import { useState } from "react";
@@ -84,12 +85,12 @@ export default function DripCalculator() {
       </div>
 
       {/* 計算ボタン */}
-      <SubmitButton onClick={calculate} color="bg-green-500" />
+      <SubmitButton onClick={calculate} color="bg-blue-500" />
 
       {/* 結果表示 */}
       {result && (
         <ResultBox
-          color="green"
+          color="blue"
           results={[
             { label: "輸液速度", value: result.mlPerHour, unit: "mL/時" },
             { label: "滴下数", value: result.dropsPerMin, unit: "滴/分" },

@@ -1,3 +1,4 @@
+// 体液計算
 "use client";
 import { useState } from "react";
 import { saveHistory } from "@/lib/history";
@@ -124,11 +125,11 @@ export default function FluidBalanceCalculator() {
       </div>
 
       {/* 計算ボタン */}
-      <SubmitButton onClick={calculate} color="bg-orange-500" />
+      <SubmitButton onClick={calculate} color="bg-green-500" />
 
       {result && (
         <ResultBox
-          color="orange"
+          color="green"
           results={[
             { label: "体重変化", value: result.weightChange, unit: "kg" },
             { label: "水分バランス", value: result.fluidBalance, unit: "mL" },

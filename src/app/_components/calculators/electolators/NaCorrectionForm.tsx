@@ -1,13 +1,12 @@
-// 電解質補正(Na)計算
 "use client";
 
 import { useState } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../LabeledInput";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox";
+import LabeledInput from "../../LabeledInput";
+import SubmitButton from "../../SubmitButton";
+import { ResultBox } from "../../ResultBox";
 
-export default function ElectrolyteCorrectionCalculator() {
+export default function NaCorrectionForm() {
   const [na, setNa] = useState("");
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
@@ -39,9 +38,7 @@ export default function ElectrolyteCorrectionCalculator() {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-semibold mb-4">電解質補正（ナトリウム）</h2>
-
+    <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <LabeledInput
           label="測定Na (mEq/L)"

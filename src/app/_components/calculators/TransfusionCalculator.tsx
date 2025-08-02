@@ -75,11 +75,11 @@ export default function TransfusionCalculator() {
         />
       </div>
 
-      <SubmitButton onClick={calculate} color="bg-fuchsia-500" />
+      <SubmitButton onClick={calculate} color="bg-rose-500" />
 
       {result && (
         <ResultBox
-          color="fuchsia"
+          color="rose"
           results={[{ label: "推定単位数", value: result, unit: "単位" }]}
           note={`※ 本計算は赤血球濃厚液（RCC）を対象としています。\n※ 実際の輸血適応は臨床判断により決定されます。`}
         />

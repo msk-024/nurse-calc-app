@@ -49,7 +49,12 @@ export const calculators: CalculatorType[] = [
     iconPath: "/icons/syringe.svg",
     color: "bg-rose-500",
   },
-
+  {
+    id: "bmi",
+    name: "BMI計算",
+    iconPath: "/icons/dumbbell.svg",
+    color: "bg-orange-500",
+  },
   // 追加予定
 ];
 

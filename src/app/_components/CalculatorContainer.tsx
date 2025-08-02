@@ -3,9 +3,10 @@ import DripCalculator from "./calculators/DripCalculator";
 import FluidBalanceCalculator from "./calculators/FluidBalanceCalculator";
 import NutritionCalculator from "./calculators/NutritionCalculator";
 import BsaCalculator from "./calculators/BsaCalculator";
-import ElectrolyteCorrectionCalculator from "./calculators/ElectrolyteCorrectionCalculator";
+import ElectrolyteCorrectionCalculator from "./calculators/electolators/ElectrolyteCorrectionCalculator";
 import OxygenCalculator from "./calculators/OxygenCalculator";
 import TransfusionCalculator from "./calculators/TransfusionCalculator";
+import BMICalculator from "./calculators/BMICalculator";
 
 export default function CalculatorContainer({
   activeCalc,
@@ -28,7 +29,9 @@ export default function CalculatorContainer({
     case "oxygen":
       return <OxygenCalculator />;
     case "transfusion":
-      return <TransfusionCalculator/>
+      return <TransfusionCalculator />;
+    case "bmi":
+      return <BMICalculator />;
     default:
       return <div>準備中...</div>;
   }

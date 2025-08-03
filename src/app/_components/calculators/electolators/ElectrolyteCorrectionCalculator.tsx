@@ -31,7 +31,7 @@ export default function ElectrolyteCorrectionCalculator() {
       </div>
 
       {/* タブ表示切替 */}
-      {tab === "na" && <NaCorrectionForm />}
+      {tab === "na" && <NaCorrectionForm />}  
       {tab === "k" && <KCorrectionForm />}
     </div>
   );

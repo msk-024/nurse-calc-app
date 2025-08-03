@@ -6,3 +6,23 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 100vh;
+}
+::-webkit-scrollbar-thumb {
+  background: #06b6d4;
+  border-radius: 100vh;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

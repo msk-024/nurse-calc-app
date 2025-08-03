@@ -1,4 +1,6 @@
+// ホーム
 "use client";
+
 import { useState } from "react";
 import Header from "@/app/_components/Header";
 import CalcNav from "@/app/_components/CalcNav";
@@ -10,7 +12,7 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <main className="max-w-md mx-auto p-4">
+      <main className="max-w-6xl mx-auto p-4">
         {/* 計算カテゴリボタン一覧 */}
         <CalcNav activeCalc={activeCalc} onSelect={setActiveCalc} />
 

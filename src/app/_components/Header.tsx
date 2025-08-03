@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter,usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function Header({ title = "看護師向け計算ツール" }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [darkMode, setDarkMode] = useState(false);
 
   // SVGパスをモードで切り替える関数
@@ -30,14 +31,27 @@ export default function Header({ title = "看護師向け計算ツール" }) {
 
       {/* ボタン群 */}
       <div className="flex gap-4">
-        <button onClick={() => router.push("/history")}>
-          <Image
-            src={getIconPath("history")}
-            alt="履歴"
-            width={24}
-            height={24}
-          />
-        </button>
+        {pathname === "/history" ? (
+          // 履歴ページなら「ホームへ戻る」
+          <button onClick={() => router.push("/")}>
+            <Image
+              src={getIconPath("home")}
+              alt="ホームへ"
+              width={24}
+              height={24}
+            />
+          </button>
+        ) : (
+          // 通常は「履歴へ」
+          <button onClick={() => router.push("/history")}>
+            <Image
+              src={getIconPath("history")}
+              alt="履歴"
+              width={24}
+              height={24}
+            />
+          </button>
+        )}
         <button onClick={toggleDarkMode}>
           <Image
             src={getIconPath(darkMode ? "dark-moon" : "light-moon")}

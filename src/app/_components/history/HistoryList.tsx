@@ -13,18 +13,27 @@ export default function HistoryList({ items }: HistoryListProps) {
         const calc = getCalculatorById(item.typeId);
 
         return (
-          <div key={item.id} className="flex items-center gap-2">
+          <div
+            key={item.id}
+            className="flex items-center gap-4 p-3 rounded-md bg-white shadow-sm border"
+          >
             {calc && (
               <Image
                 src={calc.iconPath}
                 alt={calc.name}
-                width={20}
-                height={20}
+                width={24}
+                height={24}
+                className="shrink-0"
               />
             )}
-            <div>
-              <p className="font-semibold">{calc?.name ?? "不明な計算"}</p>
-              <p className="text-xs text-gray-500">{item.resultSummary}</p>
+            <div className="flex flex-col">
+              <p className="text-xs text-gray-700">{item.timestamp}</p>
+              <div className="flex gap-5 items-center">
+                <p className="font-semibold text-sm text-gray-800">
+                  {calc?.name ?? "不明な計算"}
+                </p>
+                <p className="text-sm text-gray-800">{item.resultSummary}</p>
+              </div>
             </div>
           </div>
         );

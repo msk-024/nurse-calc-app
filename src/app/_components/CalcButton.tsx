@@ -1,3 +1,4 @@
+// 各ボタンのコンポーネント
 import Image from "next/image";
 import { CalculatorType } from "@/types/calculator";
 

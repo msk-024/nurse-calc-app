@@ -1,3 +1,4 @@
+// ボタン選択後に表示される計算フォーム
 import MedicationCalculator from "./calculators/MedicationCalculator";
 import DripCalculator from "./calculators/DripCalculator";
 import FluidBalanceCalculator from "./calculators/FluidBalanceCalculator";

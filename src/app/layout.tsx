@@ -24,6 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+          <head>
+            <link rel="manifest" href="/manifest.json" />
+            <link rel="icon" href="/icons/icon-192.png" />
+            <meta name="theme-color" content="#f87171" />
+            </head>
       <body
         className={`
           ${geistSans.variable} 

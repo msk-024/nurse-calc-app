@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function NaCorrectionForm() {
   const [na, setNa] = useState("");
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
+      useEffect(() => {
+        const payload = getReusePayload<{
+          na?: number;
+          glucose?: number;
+        }>();
+        if (payload?.typeId === "electrolyte" && payload.inputs) {
+          if (payload.inputs.na != null)
+            setNa(String(payload.inputs.na));
+          if (payload.inputs.glucose != null)
+            setGlucose(String(payload.inputs.glucose));
+          clearReusePayload();
+        }
+      }, []);
+  
   const calculate = () => {
     const measuredNa = parseFloat(na);
     const glucoseLevel = parseFloat(glucose);

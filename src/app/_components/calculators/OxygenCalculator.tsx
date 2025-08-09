@@ -1,18 +1,28 @@
 // 酸素投与量計算
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { oxygenDevices } from "@/config/oxygenDevices";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function OxygenCalculator() {
     const [deviceId, setDeviceId] = useState("nasal_cannula");
     const [flow, setFlow] = useState("");
     const [result, setResult] = useState<string | null>(null);
+
+  useEffect(()=>{
+    const payload =getReusePayload<{deviceId?:string; flow?:number;}>();
+    if(payload?.typeId==="oxygen" && payload.inputs){
+      if(payload.inputs.deviceId!=null)setDeviceId(String(payload.inputs.deviceId));
+      if(payload.inputs.flow!=null)setFlow(String(payload.inputs.flow));
+      clearReusePayload();
+    }
+  },[]);
 
     const selectedDevice = oxygenDevices.find((d) => d.id === deviceId);
 

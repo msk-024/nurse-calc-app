@@ -1,12 +1,13 @@
 // 点滴計算
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function DripCalculator() {
   const [volume, setVolume] = useState("");
@@ -16,6 +17,16 @@ export default function DripCalculator() {
     mlPerHour: string;
     dropsPerMin: string;
   }>(null);
+
+    useEffect(()=>{
+      const payload =getReusePayload<{volume?:number; hours?:number; dropFactor?:number}>();
+      if(payload?.typeId==="drip" && payload.inputs){
+        if(payload.inputs.volume!=null)setVolume(String(payload.inputs.volume));
+        if(payload.inputs.hours!=null)setHours(String(payload.inputs.hours));
+        if(payload.inputs.dropFactor!=null)setDropFactor(String(payload.inputs.dropFactor));
+        clearReusePayload();
+      }
+    },[]);
 
   const calculate = () => {
     const v = parseFloat(volume);

@@ -1,15 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function BMICalculator() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
+  
+    useEffect(() => {
+      const payload = getReusePayload<{
+        height?: number;
+        weight?: number;
+      }>();
+      if (payload?.typeId === "bmi" && payload.inputs) {
+        if (payload.inputs.height != null)
+          setHeight(String(payload.inputs.height));
+        if (payload.inputs.weight != null)
+          setWeight(String(payload.inputs.weight));
+        clearReusePayload();
+      }
+    }, []);
 
   const calculate = () => {
     const h = parseFloat(height);

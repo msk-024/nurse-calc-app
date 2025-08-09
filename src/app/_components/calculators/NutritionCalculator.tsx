@@ -1,7 +1,7 @@
 // 栄養計算
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { nutritionFactors } from "@/config/nutritionFactors";
 import type { PatientCondition } from "@/types/patient";
@@ -10,6 +10,8 @@ import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { patientConditions } from "@/config/patientConditions";
+import { getReusePayload, clearReusePayload } from "@/lib/reuse";
+import { isPatientCondition } from "@/lib/gurds";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");
@@ -19,6 +21,21 @@ export default function NutritionCalculator() {
     protein: string;
     water: string;
   }>(null);
+
+  useEffect(() => {
+    const payload = getReusePayload<{ weight?: number; condition?: string }>();
+    if (payload?.typeId === "nutrition" && payload.inputs) {
+      if (payload.inputs.weight != null)
+        setWeight(String(payload.inputs.weight));
+      if (
+        payload.inputs.condition != null &&
+        isPatientCondition(payload.inputs.condition)
+      ) {
+        setCondition(payload.inputs.condition);
+      }
+      clearReusePayload();
+    }
+  }, []);
 
   const calculate = () => {
     const w = parseFloat(weight);

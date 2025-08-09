@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function KCorrectionForm() {
   const [k, setK] = useState("");
   const [ph, setPh] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
+        useEffect(() => {
+          const payload = getReusePayload<{
+            k?: number;
+            ph?: number;
+          }>();
+          if (payload?.typeId === "electrolyte" && payload.inputs) {
+            if (payload.inputs.k != null)
+              setK(String(payload.inputs.k));
+            if (payload.inputs.ph != null)
+              setPh(String(payload.inputs.ph));
+            clearReusePayload();
+          }
+        }, []);
 
   const calculate = () => {
     const measuredK = parseFloat(k);

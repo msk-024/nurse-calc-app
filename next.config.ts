@@ -5,15 +5,9 @@ const nextConfig: NextConfig = {
   // オプション
 };
 
-const pwaConfig = withPWA({
+export default withPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
-  pwa: {
-    dest: "public",
-    register: true,
-    skipWaiting: true,
-  },
-});
-
-export default pwaConfig(nextConfig);
+  disable:process.env.NODE_ENV === "development", // dev時は無効化
+})(nextConfig);

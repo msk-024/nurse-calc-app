@@ -1,10 +1,11 @@
 // 体液計算
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { getReusePayload,clearReusePayload } from "@/lib/reuse";
 
 export default function FluidBalanceCalculator() {
   const [prevWeight, setPrevWeight] = useState("");
@@ -13,13 +14,25 @@ export default function FluidBalanceCalculator() {
   const [ivIntake, setIvIntake] = useState("");
   const [urineOutput, setUrineOutput] = useState("");
   const [otherOutput, setOtherOutput] = useState("");
-
   const [result, setResult] = useState<null | {
     weightChange: string;
     fluidBalance: string;
     estimatedFluid: string;
     status: string;
   }>(null);
+
+  useEffect(()=>{
+    const payload =getReusePayload<{currWeight?:number; oralIntake?:number; ivIntake?:number; urineOutput?:number; otherOutput?:number;}>();
+    if(payload?.typeId==="fluid" && payload.inputs){
+      if(payload.inputs.currWeight!=null)setCurrWeight(String(payload.inputs.currWeight));
+      if(payload.inputs.oralIntake!=null)setOralIntake(String(payload.inputs.oralIntake));
+      if(payload.inputs.ivIntake!=null)setIvIntake(String(payload.inputs.ivIntake));
+      if(payload.inputs.urineOutput!=null)setUrineOutput(String(payload.inputs.urineOutput));
+      if(payload.inputs.otherOutput!=null)setOtherOutput(String(payload.inputs.otherOutput));
+      clearReusePayload();
+    }
+  },[]);
+
 
   const calculate = () => {
     const wPrev = parseFloat(prevWeight);

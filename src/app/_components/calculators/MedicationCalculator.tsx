@@ -6,6 +6,8 @@ import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { reuseValidators } from "@/lib/reuse-registry";
+import { isMedicationInputs } from "@/lib/guards";
 // import { calculators } from "@/config/calculators";
 
 export default function MedicationCalculator() {
@@ -17,16 +19,18 @@ export default function MedicationCalculator() {
     volume: string;
   } | null>(null);
 
-useEffect(()=>{
-  const payload =getReusePayload<{weight?:number; dose?:number; concentration?:number}>();
-  if(payload?.typeId==="medication" && payload.inputs){
-    if(payload.inputs.weight!=null)setWeight(String(payload.inputs.weight));
-    if(payload.inputs.dose!=null)setDose(String(payload.inputs.dose));
-    if(payload.inputs.concentration!=null)setConcentration(String(payload.inputs.concentration));
-    clearReusePayload();
+useEffect(() => {
+  const payload = getReusePayload();
+  if (payload?.typeId === "medication" && isMedicationInputs(payload.inputs)) {
+    const ok = reuseValidators.medication(payload.inputs);
+    if (ok) {
+      setWeight(String(payload.inputs!.weight));
+      setDose(String(payload.inputs!.dose));
+      setConcentration(String(payload.inputs!.concentration));
+      clearReusePayload();
+    }
   }
-},[]);
-
+}, []);
 
   const calculate = () => {
     const w = parseFloat(weight);

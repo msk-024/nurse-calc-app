@@ -11,7 +11,7 @@ import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { patientConditions } from "@/config/patientConditions";
 import { getReusePayload, clearReusePayload } from "@/lib/reuse";
-import { isPatientCondition } from "@/lib/gurds";
+import { isPatientCondition } from "@/lib/guards";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");

@@ -9,6 +9,7 @@ import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { isOxygenInputs } from "@/lib/guards";
 
 export default function OxygenCalculator() {
     const [deviceId, setDeviceId] = useState("nasal_cannula");
@@ -16,10 +17,11 @@ export default function OxygenCalculator() {
     const [result, setResult] = useState<string | null>(null);
 
   useEffect(()=>{
-    const payload =getReusePayload<{deviceId?:string; flow?:number;}>();
-    if(payload?.typeId==="oxygen" && payload.inputs){
-      if(payload.inputs.deviceId!=null)setDeviceId(String(payload.inputs.deviceId));
-      if(payload.inputs.flow!=null)setFlow(String(payload.inputs.flow));
+    const payload =getReusePayload();
+    if(payload?.typeId==="oxygen" && isOxygenInputs(payload.inputs)){
+      const {deviceId,flow}=payload.inputs;
+      setDeviceId(String(deviceId));
+      setFlow(String(flow));
       clearReusePayload();
     }
   },[]);

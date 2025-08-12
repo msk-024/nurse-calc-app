@@ -8,6 +8,7 @@ import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { isDripInputs } from "@/lib/guards";
 
 export default function DripCalculator() {
   const [volume, setVolume] = useState("");
@@ -19,11 +20,12 @@ export default function DripCalculator() {
   }>(null);
 
     useEffect(()=>{
-      const payload =getReusePayload<{volume?:number; hours?:number; dropFactor?:number}>();
-      if(payload?.typeId==="drip" && payload.inputs){
-        if(payload.inputs.volume!=null)setVolume(String(payload.inputs.volume));
-        if(payload.inputs.hours!=null)setHours(String(payload.inputs.hours));
-        if(payload.inputs.dropFactor!=null)setDropFactor(String(payload.inputs.dropFactor));
+      const payload =getReusePayload();
+      if(payload?.typeId==="drip" && isDripInputs(payload.inputs)){
+        const { volume,hours,dropFactor}=payload.inputs;
+        setVolume(String(volume));
+        setHours(String(hours));
+        setDropFactor(String(dropFactor));
         clearReusePayload();
       }
     },[]);

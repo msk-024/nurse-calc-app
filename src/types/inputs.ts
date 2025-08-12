@@ -20,4 +20,35 @@ export type NutritionInputs = {
   condition: import("./patient").PatientCondition;
 };
 
-// …必要に応じて他の計算も追加
+// 体液バランス
+export type FluidInputs = {
+  prevWeight:number;
+  currWeight:number;
+  oralIntake?:number;
+  ivIntake?:number;
+  urineOutput?:number;
+  otherOutput?:number;
+};
+
+// 体表面積
+export type BsaInputs = {
+  weight: number;
+  height: number;
+};
+// 電解質補正
+export type NaCorrectionInputs = { na: number; glucose: number; };
+export type KCorrectionInputs = { k: number; ph: number; };
+
+// 輸血
+export type TransfusionInputs = {
+weight:number; currentHb:number; targetHb:number;
+};
+// 酸素
+export type OxygenInputs = {
+deviceId:string; flow?:number;
+};
+// BMI
+export type BmiInputs = {
+  weight: number;
+  height: number;
+};

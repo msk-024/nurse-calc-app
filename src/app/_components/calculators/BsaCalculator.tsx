@@ -1,31 +1,28 @@
 // 体表面積
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { getReusePayload, clearReusePayload } from "@/lib/reuse";
+import { isBsaInputs } from "@/lib/guards";
 
 export default function BsaCalculator() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
-    useEffect(() => {
-      const payload = getReusePayload<{
-        height?: number;
-        weight?: number;
-      }>();
-      if (payload?.typeId === "bsa" && payload.inputs) {
-        if (payload.inputs.height != null)
-          setHeight(String(payload.inputs.height));
-        if (payload.inputs.weight != null)
-          setWeight(String(payload.inputs.weight));
-        clearReusePayload();
-      }
-    }, []);
+  useEffect(() => {
+    const payload = getReusePayload();
+    if (payload?.typeId === "bsa" && isBsaInputs(payload.inputs)) {
+      const { height, weight } = payload.inputs;
+      setHeight(String(height));
+      setWeight(String(weight));
+      clearReusePayload();
+    }
+  }, []);
 
   const calculate = () => {
     const h = parseFloat(height);

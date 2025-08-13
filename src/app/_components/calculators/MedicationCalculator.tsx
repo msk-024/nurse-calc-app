@@ -6,7 +6,6 @@ import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getReusePayload,clearReusePayload } from "@/lib/reuse";
-import { reuseValidators } from "@/lib/reuse-registry";
 import { isMedicationInputs } from "@/lib/guards";
 // import { calculators } from "@/config/calculators";
 
@@ -22,13 +21,11 @@ export default function MedicationCalculator() {
 useEffect(() => {
   const payload = getReusePayload();
   if (payload?.typeId === "medication" && isMedicationInputs(payload.inputs)) {
-    const ok = reuseValidators.medication(payload.inputs);
-    if (ok) {
-      setWeight(String(payload.inputs!.weight));
-      setDose(String(payload.inputs!.dose));
-      setConcentration(String(payload.inputs!.concentration));
+    const {weight,dose,concentration} = payload.inputs;
+      setWeight(String(weight));
+      setDose(String(dose));
+      setConcentration(String(concentration));
       clearReusePayload();
-    }
   }
 }, []);
 

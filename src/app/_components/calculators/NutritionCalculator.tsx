@@ -11,7 +11,7 @@ import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { patientConditions } from "@/config/patientConditions";
 import { getReusePayload, clearReusePayload } from "@/lib/reuse";
-import { isPatientCondition } from "@/lib/guards";
+import { isNutritionInputs } from "@/lib/guards";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");
@@ -23,16 +23,11 @@ export default function NutritionCalculator() {
   }>(null);
 
   useEffect(() => {
-    const payload = getReusePayload<{ weight?: number; condition?: string }>();
-    if (payload?.typeId === "nutrition" && payload.inputs) {
-      if (payload.inputs.weight != null)
-        setWeight(String(payload.inputs.weight));
-      if (
-        payload.inputs.condition != null &&
-        isPatientCondition(payload.inputs.condition)
-      ) {
-        setCondition(payload.inputs.condition);
-      }
+    const payload = getReusePayload();
+    if (payload?.typeId === "nutrition" && isNutritionInputs(payload.inputs)) {
+      const {weight,condition}=payload.inputs;
+        setWeight(String(weight));
+        setCondition(condition);
       clearReusePayload();
     }
   }, []);

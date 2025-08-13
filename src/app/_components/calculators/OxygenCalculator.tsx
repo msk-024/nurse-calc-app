@@ -21,7 +21,7 @@ export default function OxygenCalculator() {
     if(payload?.typeId==="oxygen" && isOxygenInputs(payload.inputs)){
       const {deviceId,flow}=payload.inputs;
       setDeviceId(String(deviceId));
-      setFlow(String(flow));
+      if(flow != null)setFlow(String(flow));
       clearReusePayload();
     }
   },[]);

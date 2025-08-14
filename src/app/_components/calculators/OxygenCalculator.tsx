@@ -8,7 +8,7 @@ import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
 import { isOxygenInputs } from "@/lib/guards";
 
 export default function OxygenCalculator() {
@@ -17,7 +17,7 @@ export default function OxygenCalculator() {
     const [result, setResult] = useState<string | null>(null);
 
   useEffect(()=>{
-    const payload =getReusePayload();
+    const payload =getReusePayloadOnce();
     if(payload?.typeId==="oxygen" && isOxygenInputs(payload.inputs)){
       const {deviceId,flow}=payload.inputs;
       setDeviceId(String(deviceId));

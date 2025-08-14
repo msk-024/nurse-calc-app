@@ -5,7 +5,7 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
-import { getReusePayload,clearReusePayload } from "@/lib/reuse";
+import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
 import { isNaCorrectionInputs } from "@/lib/guards";
 
 export default function NaCorrectionForm() {
@@ -14,8 +14,8 @@ export default function NaCorrectionForm() {
   const [result, setResult] = useState<string | null>(null);
 
       useEffect(() => {
-        const payload = getReusePayload();
-        if (payload?.typeId === "electrolyte" && isNaCorrectionInputs(payload.inputs)) {
+        const payload = getReusePayloadOnce();
+        if (payload?.typeId === "electrolyte" && payload.sub === "na" && isNaCorrectionInputs(payload.inputs)) {
           const {na,glucose}=payload.inputs;
             setNa(String(na));
             setGlucose(String(glucose));

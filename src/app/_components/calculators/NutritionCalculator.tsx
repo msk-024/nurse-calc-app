@@ -10,7 +10,7 @@ import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { patientConditions } from "@/config/patientConditions";
-import { getReusePayload, clearReusePayload } from "@/lib/reuse";
+import { getReusePayloadOnce, clearReusePayload } from "@/lib/reuse";
 import { isNutritionInputs } from "@/lib/guards";
 
 export default function NutritionCalculator() {
@@ -23,7 +23,7 @@ export default function NutritionCalculator() {
   }>(null);
 
   useEffect(() => {
-    const payload = getReusePayload();
+    const payload = getReusePayloadOnce();
     if (payload?.typeId === "nutrition" && isNutritionInputs(payload.inputs)) {
       const {weight,condition}=payload.inputs;
         setWeight(String(weight));

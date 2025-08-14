@@ -1,24 +1,51 @@
-// クライアント専用のユーティリティ
-export type ReusePayload<T = unknown> = {
+// クライアント専用のユーティリティ（SSR安全）
+
+const STORAGE_KEY = "reusePayload";
+
+export type ReusePayload = {
   typeId: string;
-  inputs?: T; // 履歴にinputsがないケースもあるのでoptional
+  sub?: "na" | "k"; // 電解質タブ識別用（任意）
+  inputs?: unknown; // ここは unknown にする（型は各ページの型ガードで絞る）
   timestamp?: string;
 };
 
-export function setReusePayload<T>(payload: ReusePayload<T>) {
-  localStorage.setItem("reusePayload",JSON.stringify(payload));
+// 保存
+export function setReusePayload(payload: ReusePayload): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // 端末のプライベートモード等で localStorage 不可な場合の握り潰し
+  }
 }
 
-export function getReusePayload<T>(): ReusePayload<T> | null {
-  const item = localStorage.getItem("reusePayload");
-  if (!item) return null;
+// 取得（クリアしない）
+export function getReusePayload(): ReusePayload | null {
+  if (typeof window === "undefined") return null;
   try {
-    return JSON.parse(item) as ReusePayload<T>;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && "typeId" in parsed) {
+      return parsed as ReusePayload;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-export function clearReusePayload() {
-  localStorage.removeItem("reusePayload");
+// 取得して即クリア（取り回しが楽）
+export function getReusePayloadOnce(): ReusePayload | null {
+  const p = getReusePayload();
+  if (p) clearReusePayload();
+  return p;
+}
+
+// クリア
+export function clearReusePayload(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
 }

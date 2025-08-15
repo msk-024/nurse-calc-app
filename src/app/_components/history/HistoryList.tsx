@@ -2,7 +2,7 @@ import Image from "next/image";
 import { HistoryItem } from "@/types/history";
 import { getCalculatorById } from "@/config/calculators";
 import { useRouter } from "next/navigation";
-import { setReusePayload } from "@/lib/reuse";
+// import { setReusePayload } from "@/lib/reuse";
 
 type HistoryListProps = {
   items: HistoryItem[];
@@ -11,11 +11,17 @@ type HistoryListProps = {
 export default function HistoryList({ items }: HistoryListProps) {
   const router = useRouter();
   const handleReuse = (item: HistoryItem) => {
-    setReusePayload({
-      typeId:item.typeId,
-      inputs:item.inputs,
-      timestamp:item.timestamp,
-    });
+    if (!item.inputs) return; // 念のため
+    // localStorageに保存（型情報はstringで統一）
+    localStorage.setItem(
+      `reusePayload:${item.typeId}`,
+      JSON.stringify(item.inputs)
+    );
+    // setReusePayload({
+    //   typeId:item.typeId,
+    //   inputs:item.inputs,
+    //   timestamp:item.timestamp,
+    // });
     router.push(`/${item.typeId}`);
   };
 

@@ -6,8 +6,9 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isTransfusionInput } from "@/lib/guards";
+import { TransfusionInputs } from "@/types/inputs";
 
 export default function TransfusionCalculator() {
   const [weight, setWeight] = useState("");
@@ -15,16 +16,17 @@ export default function TransfusionCalculator() {
   const [targetHb, setTargetHb] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
-  useEffect(()=>{
-    const payload =getReusePayloadOnce();
-    if(payload?.typeId==="transfusion" && isTransfusionInput(payload.inputs)){
-      const {weight,currentHb,targetHb}=payload.inputs;
-      setWeight(String(weight));
-      setCurrentHb(String(currentHb));
-      setTargetHb(String(targetHb));
-      clearReusePayload();
-    }
-  },[]);
+useEffect(() => {
+  const data = getTypedReusePayloadOnce<TransfusionInputs>(
+    "transfusion",
+    isTransfusionInput
+  );
+  if (!data) return;
+  const { weight, currentHb, targetHb } = data;
+  setWeight(String(weight));
+  setCurrentHb(String(currentHb));
+  setTargetHb(String(targetHb));
+}, []);
 
   const calculate = () => {
     const w = parseFloat(weight);

@@ -49,3 +49,32 @@ export function clearReusePayload(): void {
     localStorage.removeItem(STORAGE_KEY);
   } catch {}
 }
+
+export function getTypedReusePayloadOnce<T>(
+  typeId: string,
+  isValid: (v: unknown) => v is T
+): T | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = localStorage.getItem("reusePayload");
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "typeId" in parsed &&
+      parsed.typeId === typeId &&
+      "inputs" in parsed &&
+      isValid(parsed.inputs)
+    ) {
+      localStorage.removeItem("reusePayload");
+      return parsed.inputs;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}

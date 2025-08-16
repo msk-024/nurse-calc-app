@@ -6,8 +6,9 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce, clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isBsaInputs } from "@/lib/guards";
+import type { BsaInputs } from "@/types/inputs";
 
 export default function BsaCalculator() {
   const [height, setHeight] = useState("");
@@ -15,13 +16,10 @@ export default function BsaCalculator() {
   const [result, setResult] = useState<string | null>(null);
 
   useEffect(() => {
-    const payload = getReusePayloadOnce();
-    if (payload?.typeId === "bsa" && isBsaInputs(payload.inputs)) {
-      const { height, weight } = payload.inputs;
-      setHeight(String(height));
-      setWeight(String(weight));
-      clearReusePayload();
-    }
+    const data = getTypedReusePayloadOnce<BsaInputs>("bsa", isBsaInputs);    
+    if (!data)return;
+      setHeight(String(data.height));
+      setWeight(String(data.weight));
   }, []);
 
   const calculate = () => {

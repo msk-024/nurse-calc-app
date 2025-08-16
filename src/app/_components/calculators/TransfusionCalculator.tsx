@@ -8,7 +8,7 @@ import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isTransfusionInput } from "@/lib/guards";
-import { TransfusionInputs } from "@/types/inputs";
+import type { TransfusionInputs } from "@/types/inputs";
 
 export default function TransfusionCalculator() {
   const [weight, setWeight] = useState("");

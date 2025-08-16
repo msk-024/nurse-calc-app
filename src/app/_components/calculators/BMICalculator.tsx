@@ -5,8 +5,9 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isBmiInputs } from "@/lib/guards";
+import type { BmiInputs } from "@/types/inputs";
 
 export default function BMICalculator() {
   const [height, setHeight] = useState("");
@@ -14,15 +15,14 @@ export default function BMICalculator() {
   const [result, setResult] = useState<string | null>(null);
 
   
-    useEffect(() => {
-      const payload = getReusePayloadOnce();
-      if (payload?.typeId === "bmi" && isBmiInputs(payload.inputs)) {
-        const{height,weight}=payload.inputs;
-          setHeight(String(height));
-          setWeight(String(weight));
-        clearReusePayload();
-      }
-    }, []);
+useEffect(() => {
+  const data = getTypedReusePayloadOnce<BmiInputs>("bmi", isBmiInputs);
+  if (!data) return;
+
+  setHeight(String(data.height));
+  setWeight(String(data.weight));
+}, []);
+
 
   const calculate = () => {
     const h = parseFloat(height);

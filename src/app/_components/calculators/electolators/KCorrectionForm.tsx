@@ -5,8 +5,9 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
-import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isKCorrectionInputs } from "@/lib/guards";
+import type { KCorrectionInputs } from "@/types/inputs";
 
 export default function KCorrectionForm() {
   const [k, setK] = useState("");
@@ -14,17 +15,13 @@ export default function KCorrectionForm() {
   const [result, setResult] = useState<string | null>(null);
 
         useEffect(() => {
-          const payload = getReusePayloadOnce();
-          if (
-            payload?.typeId === "electrolyte" &&
-            payload.sub === "k" &&
-            isKCorrectionInputs(payload.inputs)
-          ) {
-            const { k, ph } = payload.inputs;
-            setK(String(k));
-            setPh(String(ph));
-            clearReusePayload();
-          }
+         const data = getTypedReusePayloadOnce<KCorrectionInputs>(
+           "electrolyte",
+           isKCorrectionInputs
+         );
+          if (!data)return;
+             setK(String(data.k));
+            setPh(String(data.ph));
         }, []);
 
   const calculate = () => {

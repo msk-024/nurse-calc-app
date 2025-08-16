@@ -8,23 +8,24 @@ import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isOxygenInputs } from "@/lib/guards";
+import type { OxygenInputs } from "@/types/inputs";
 
 export default function OxygenCalculator() {
     const [deviceId, setDeviceId] = useState("nasal_cannula");
     const [flow, setFlow] = useState("");
     const [result, setResult] = useState<string | null>(null);
 
-  useEffect(()=>{
-    const payload =getReusePayloadOnce();
-    if(payload?.typeId==="oxygen" && isOxygenInputs(payload.inputs)){
-      const {deviceId,flow}=payload.inputs;
-      setDeviceId(String(deviceId));
-      if(flow != null)setFlow(String(flow));
-      clearReusePayload();
-    }
-  },[]);
+useEffect(() => {
+  const data = getTypedReusePayloadOnce<OxygenInputs>("oxygen", isOxygenInputs);
+  if (!data) return;
+
+  const { deviceId, flow } = data;
+
+  setDeviceId(String(deviceId));
+  if (flow != null) setFlow(String(flow)); // flow は任意
+}, []);
 
     const selectedDevice = oxygenDevices.find((d) => d.id === deviceId);
 

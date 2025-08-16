@@ -1,12 +1,13 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce,clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isMedicationInputs } from "@/lib/guards";
+import type { MedicationInputs } from "@/types/inputs";
 // import { calculators } from "@/config/calculators";
 
 export default function MedicationCalculator() {
@@ -18,16 +19,16 @@ export default function MedicationCalculator() {
     volume: string;
   } | null>(null);
 
-useEffect(() => {
-  const payload = getReusePayloadOnce();
-  if (payload?.typeId === "medication" && isMedicationInputs(payload.inputs)) {
-    const {weight,dose,concentration} = payload.inputs;
-      setWeight(String(weight));
-      setDose(String(dose));
-      setConcentration(String(concentration));
-      clearReusePayload();
-  }
-}, []);
+  useEffect(() => {
+    const data = getTypedReusePayloadOnce<MedicationInputs>(
+      "medication",
+      isMedicationInputs
+    );
+    if (!data) return;
+    setWeight(String(data.weight));
+    setDose(String(data.dose));
+    setConcentration(String(data.concentration));
+  }, []);
 
   const calculate = () => {
     const w = parseFloat(weight);

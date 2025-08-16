@@ -5,8 +5,9 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getReusePayloadOnce, clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isFluidInputs } from "@/lib/guards";
+import type { FluidInputs } from "@/types/inputs";
 
 export default function FluidBalanceCalculator() {
   const [prevWeight, setPrevWeight] = useState("");
@@ -22,20 +23,26 @@ export default function FluidBalanceCalculator() {
     status: string;
   }>(null);
 
-  useEffect(() => {
-    const payload = getReusePayloadOnce();
-    if (payload?.typeId === "fluid" && isFluidInputs(payload.inputs)) {
-      const { prevWeight,currWeight, oralIntake, ivIntake, urineOutput, otherOutput } =
-        payload.inputs;
-      setPrevWeight(String(prevWeight));
-      setCurrWeight(String(currWeight));
-      if(oralIntake != null)setOralIntake(String(oralIntake));
-      if(ivIntake != null)setIvIntake(String(ivIntake));
-      if(urineOutput != null)setUrineOutput(String(urineOutput));
-      if(otherOutput != null)setOtherOutput(String(otherOutput));
-      clearReusePayload();
-    }
-  }, []);
+useEffect(() => {
+  const data = getTypedReusePayloadOnce<FluidInputs>("fluid", isFluidInputs);
+  if (!data) return;
+
+  const {
+    prevWeight,
+    currWeight,
+    oralIntake,
+    ivIntake,
+    urineOutput,
+    otherOutput,
+  } = data;
+
+  setPrevWeight(String(prevWeight));
+  setCurrWeight(String(currWeight));
+  if (oralIntake != null) setOralIntake(String(oralIntake));
+  if (ivIntake != null) setIvIntake(String(ivIntake));
+  if (urineOutput != null) setUrineOutput(String(urineOutput));
+  if (otherOutput != null) setOtherOutput(String(otherOutput));
+}, []);
 
   const calculate = () => {
     const wPrev = parseFloat(prevWeight);

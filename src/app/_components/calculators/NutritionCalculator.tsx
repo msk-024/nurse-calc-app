@@ -10,8 +10,9 @@ import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { patientConditions } from "@/config/patientConditions";
-import { getReusePayloadOnce, clearReusePayload } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isNutritionInputs } from "@/lib/guards";
+import type { NutritionInputs } from "@/types/inputs";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");
@@ -22,15 +23,17 @@ export default function NutritionCalculator() {
     water: string;
   }>(null);
 
-  useEffect(() => {
-    const payload = getReusePayloadOnce();
-    if (payload?.typeId === "nutrition" && isNutritionInputs(payload.inputs)) {
-      const {weight,condition}=payload.inputs;
-        setWeight(String(weight));
-        setCondition(condition);
-      clearReusePayload();
-    }
-  }, []);
+useEffect(() => {
+  const data = getTypedReusePayloadOnce<NutritionInputs>(
+    "nutrition",
+    isNutritionInputs
+  );
+  if (!data) return;
+
+  setWeight(String(data.weight));
+  setCondition(data.condition); // 文字列（選択肢）の場合
+}, []);
+
 
   const calculate = () => {
     const w = parseFloat(weight);

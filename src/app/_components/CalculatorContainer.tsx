@@ -4,7 +4,7 @@ import DripCalculator from "./calculators/DripCalculator";
 import FluidBalanceCalculator from "./calculators/FluidBalanceCalculator";
 import NutritionCalculator from "./calculators/NutritionCalculator";
 import BsaCalculator from "./calculators/BsaCalculator";
-import ElectrolyteCorrectionCalculator from "./calculators/electolators/ElectrolyteCorrectionCalculator";
+import ElectrolyteCorrectionCalculator from "./calculators/electrolytes/ElectrolyteCorrectionCalculator";
 import OxygenCalculator from "./calculators/OxygenCalculator";
 import TransfusionCalculator from "./calculators/TransfusionCalculator";
 import BMICalculator from "./calculators/BMICalculator";

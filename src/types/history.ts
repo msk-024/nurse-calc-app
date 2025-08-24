@@ -4,6 +4,7 @@ export interface HistoryItem {
   typeId: string;
   typeName: string;
   timestamp: string;
+  sub?: "na" | "k";
   inputs?: Record<string, number | string>;
   result: Record<string, number | string>;
   resultSummary?: string;

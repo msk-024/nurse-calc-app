@@ -14,14 +14,14 @@ export default function HistoryList({ items }: HistoryListProps) {
     if (!item.inputs) return; // 念のため
     // localStorageに保存（型情報はstringで統一）
     localStorage.setItem(
-      `reusePayload:${item.typeId}`,
-      JSON.stringify(item.inputs)
+      "reusePayload",
+      JSON.stringify({
+        typeId: item.typeId,
+        sub: item.sub, // Na/K切り替えが必要なもの
+        inputs: item.inputs,
+        timestamp: item.timestamp,
+      })
     );
-    // setReusePayload({
-    //   typeId:item.typeId,
-    //   inputs:item.inputs,
-    //   timestamp:item.timestamp,
-    // });
     router.push(`/${item.typeId}`);
   };
 
@@ -32,7 +32,7 @@ export default function HistoryList({ items }: HistoryListProps) {
         return (
           <div
             key={item.id}
-            className="flex justify-between items-center gap-4 p-3 rounded-md bg-white shadow-sm border"
+            className="flex justify-between items-center gap-2 md:gap-4 p-3 rounded-md bg-white shadow-sm border"
           >
             <div className="flex items-center gap-4">
               {calc && (
@@ -46,7 +46,7 @@ export default function HistoryList({ items }: HistoryListProps) {
               )}
               <div className="flex flex-col">
                 <p className="text-xs text-gray-700">{item.timestamp}</p>
-                <div className="flex gap-5 items-center">
+                <div className="flex flex-col gap-1 items-start mt-1 md:flex-row md:gap-4 md:items-center md:mt-0">
                   <p className="font-semibold text-sm text-gray-800">
                     {calc?.name ?? "不明な計算"}
                   </p>

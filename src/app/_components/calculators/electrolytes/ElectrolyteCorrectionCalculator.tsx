@@ -1,10 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NaCorrectionForm from "./NaCorrectionForm";
 import KCorrectionForm from "./KCorrectionForm";
+import { getReusePayloadOnce } from "@/lib/reuse";
 
 export default function ElectrolyteCorrectionCalculator() {
   const [tab, setTab] = useState<"na" | "k">("na");
+
+  useEffect(() => {
+    const reuse = getReusePayloadOnce();
+    if (
+      reuse?.typeId === "electrolyte" &&
+      (reuse.sub === "na" || reuse.sub === "k")
+    ) {
+      setTab(reuse.sub); // subの値でタブを切り替え
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -31,7 +42,7 @@ export default function ElectrolyteCorrectionCalculator() {
       </div>
 
       {/* タブ表示切替 */}
-      {tab === "na" && <NaCorrectionForm />}  
+      {tab === "na" && <NaCorrectionForm />}
       {tab === "k" && <KCorrectionForm />}
     </div>
   );

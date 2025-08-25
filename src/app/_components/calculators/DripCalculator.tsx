@@ -106,6 +106,7 @@ useEffect(() => {
             { label: "輸液速度", value: result.mlPerHour, unit: "mL/時" },
             { label: "滴下数", value: result.dropsPerMin, unit: "滴/分" },
           ]}
+          typeId="drip"
         />
       )}
     </div>

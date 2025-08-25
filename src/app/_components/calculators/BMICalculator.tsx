@@ -75,6 +75,7 @@ useEffect(() => {
           color="orange"
           results={[{ label: "BMI", value: result, unit: "" }]}
           note="※ BMIは目安です。個人差があるため臨床判断と併用してください。"
+          typeId="bmi"
         />
       )}
     </div>

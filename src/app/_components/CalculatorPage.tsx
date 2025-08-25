@@ -1,3 +1,4 @@
+// 履歴再利用のためのページ
 "use client";
 
 import { useState } from "react";

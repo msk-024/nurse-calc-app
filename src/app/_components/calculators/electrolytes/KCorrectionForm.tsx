@@ -77,6 +77,7 @@ export default function KCorrectionForm() {
           color="cyan"
           results={[{ label: "補正K", value: result, unit: "mEq/L" }]}
           note="※ Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)"
+          typeId="electrolyte-k"
         />
       )}
     </div>

@@ -76,6 +76,7 @@ export default function BsaCalculator() {
           color="purple"
           results={[{ label: "体表面積", value: result, unit: "m²" }]}
           note="※ 使用式: Mosteller式 √(身長×体重 ÷ 3600)"
+          typeId="bsa"
         />
       )}
     </div>

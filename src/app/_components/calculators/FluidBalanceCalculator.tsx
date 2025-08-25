@@ -159,6 +159,7 @@ useEffect(() => {
             { label: "推定体液変動", value: result.estimatedFluid, unit: "mL" },
             { label: "評価", value: result.status, unit: "" },
           ]}
+          typeId="fluid"
         />
       )}
     </div>

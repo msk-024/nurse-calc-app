@@ -1,17 +1,9 @@
 "use client";
 
 import React from "react";
-
-// interface ResultBoxProps {
-//   title?: string; // 例: "計算結果"
-//   results: {
-//     label: string; // 例: "エネルギー"
-//     value: string | number; // 例: "1800"
-//     unit: string; // 例: "kcal"
-//   }[];
-//   color?: "green" | ... // Tailwind対応色
-//   note?: string; // 補足（例: 医師の指示と照合してください）
-// };
+import { Popover } from "@headlessui/react";
+import Image from "next/image";
+import { helpTexts } from "@/config/helpTexts";
 
 interface ResultItem {
   label: string;
@@ -34,6 +26,7 @@ interface ResultBoxProps {
     | "rose"
     | "yellow";
   note?: string;
+  typeId?: string; // 注意文の判別用
 }
 
 export const ResultBox: React.FC<ResultBoxProps> = ({
@@ -41,6 +34,7 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
   results,
   color = "blue",
   note,
+  typeId,
 }) => {
   const bg = {
     green: "bg-green-50 border-green-200 text-green-800", // 体液バランス
@@ -55,9 +49,32 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
     yellow: "bg-yellow-50 border-yellow-200 text-yellow-800", // 投薬
   }[color];
 
+  const helpText = typeId ? helpTexts[typeId] : null;
+
   return (
     <div className={`border rounded p-4 ${bg}`}>
-      <h3 className="font-semibold mb-2">{title}</h3>
+      {/* タイトルとヘルプアイコン */}
+      <div className="flex items-start justify-between">
+        <h3 className="font-semibold">{title}</h3>
+        {helpText && (
+          <Popover className="relative">
+            <Popover.Button aria-label="注意説明">
+              <Image
+                src="/icons/help-icon.svg"
+                alt="注意"
+                width={20}
+                height={20}
+                className="cursor-pointer"
+              />
+            </Popover.Button>
+
+            <Popover.Panel className="absolute z-10 mt-2 right-0 w-64 p-3 bg-white border rounded shadow-md text-sm text-gray-700">
+              {helpText}
+            </Popover.Panel>
+          </Popover>
+        )}
+      </div>
+      {/* 結果リスト */}
       <ul className="space-y-1">
         {results.map((item, i) => (
           <li key={i}>

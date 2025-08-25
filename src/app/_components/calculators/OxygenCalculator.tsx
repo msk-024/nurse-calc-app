@@ -92,6 +92,7 @@ useEffect(() => {
           color="teal"
           results={[{ label: "推定 FiO₂", value: result, unit: "%" }]}
           note={`※ FiO₂の値は代表的な推定値です。\n※ 実際の酸素濃度を保証するものではありません。目安としてご使用ください。\n ※ 患者の呼吸状態やマスクのフィット感により変動します。`}
+          typeId="oxygen"
         />
       )}
     </div>

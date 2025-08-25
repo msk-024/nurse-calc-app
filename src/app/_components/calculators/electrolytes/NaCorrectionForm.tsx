@@ -78,6 +78,7 @@ useEffect(() => {
           color="cyan"
           results={[{ label: "補正Na", value: result, unit: "mEq/L" }]}
           note="※ Katzの式：補正Na = 測定Na + 0.016 × (血糖値 - 100)"
+          typeId="electrolyte-na"
         />
       )}
     </div>

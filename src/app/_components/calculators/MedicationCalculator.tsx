@@ -98,6 +98,7 @@ export default function MedicationCalculator() {
             { label: "総投与量", value: result.totalDose, unit: "mg" },
             { label: "薬液量", value: result.volume, unit: "mL" },
           ]}
+          typeId="medication"
         />
       )}
     </div>

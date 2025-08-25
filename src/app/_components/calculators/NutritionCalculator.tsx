@@ -98,6 +98,7 @@ useEffect(() => {
               { label: "水分量", value: result.water, unit: "mL" },
             ]}
             note="※ 推定値です。実際の栄養管理は医師・栄養士の指示に従ってください。"
+            typeId="nutrition"
           />
           {(condition === "burn" || condition === "critical") && (
             <p className="text-sm text-red-600">

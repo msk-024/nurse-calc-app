@@ -68,7 +68,7 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
               />
             </Popover.Button>
 
-            <Popover.Panel className="absolute z-10 mt-2 right-0 w-64 p-3 bg-white border rounded shadow-md text-sm text-gray-700">
+            <Popover.Panel className="absolute z-10 mt-2 right-0 top-0 w-64 p-3 bg-white border rounded shadow-md text-sm text-gray-700">
               {helpText}
             </Popover.Panel>
           </Popover>

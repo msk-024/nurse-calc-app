@@ -83,7 +83,14 @@ useEffect(() => {
       timestamp: new Date().toLocaleString("ja-JP"),
       typeId: "fluid",
       typeName: "体液バランス計算",
-      inputs: { wPrev, wCurr, oral, iv, urine, other },
+      inputs: {
+        prevWeight: wPrev,
+        currWeight: wCurr,
+        oralIntake: oral,
+        ivIntake: iv,
+        urineOutput: urine,
+        otherOutput: other,
+      },
       result: calcResult,
       resultSummary: summary,
     });

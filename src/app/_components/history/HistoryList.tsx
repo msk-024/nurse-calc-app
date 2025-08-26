@@ -57,7 +57,7 @@ export default function HistoryList({ items }: HistoryListProps) {
             {/* 再利用ボタン */}
             <button
               onClick={() => handleReuse(item)}
-              className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+              className="w-1/5 text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
             >
               再利用
             </button>

@@ -44,8 +44,9 @@ useEffect(() => {
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",
+      sub:"na",
       typeName: "電解質補正",
-      inputs: { measuredNa, glucoseLevel },
+      inputs: { na:measuredNa, glucose:glucoseLevel },
       result: { correctedNa: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

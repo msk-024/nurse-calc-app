@@ -54,7 +54,7 @@ useEffect(() => {
       id: Date.now(),
       typeId: "oxygen",
       typeName: "酸素投与量計算",
-      inputs: { device: selectedDevice.name, flow: flowRate || "未入力" },
+      inputs: { deviceId, flow: flowRate },
       result: { fio2: fiO2.toFixed(0) },
       resultSummary: `推定FiO₂: ${fiO2.toFixed(0)}%`,
       timestamp: new Date().toLocaleString("ja-JP"),

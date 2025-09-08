@@ -43,8 +43,9 @@ export default function KCorrectionForm() {
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",
+      sub:"k",
       typeName: "電解質補正",
-      inputs: { measuredK, pH },
+      inputs: { k:measuredK, ph:pH },
       result: { correctedK: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

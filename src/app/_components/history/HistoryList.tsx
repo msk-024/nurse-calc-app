@@ -22,6 +22,12 @@ export default function HistoryList({ items }: HistoryListProps) {
         timestamp: item.timestamp,
       })
     );
+    console.log("保存データ", {
+      typeId: item.typeId,
+      sub: item.sub,
+      inputs: item.inputs,
+      timestamp: item.timestamp,
+    });
     router.push(`/${item.typeId}`);
   };
 
@@ -48,7 +54,13 @@ export default function HistoryList({ items }: HistoryListProps) {
                 <p className="text-xs text-gray-700">{item.timestamp}</p>
                 <div className="flex flex-col gap-1 items-start mt-1 md:flex-row md:gap-4 md:items-center md:mt-0">
                   <p className="font-semibold text-sm text-gray-800">
-                    {calc?.name ?? "不明な計算"}
+                    {item.typeId === "electrolyte"
+                      ? item.sub === "k"
+                        ? "K補正"
+                        : item.sub === "na"
+                        ? "Na補正"
+                        : "電解質補正"
+                      : calc?.name ?? "不明な計算"}
                   </p>
                   <p className="text-sm text-gray-800">{item.resultSummary}</p>
                 </div>

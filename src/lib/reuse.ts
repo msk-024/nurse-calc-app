@@ -50,9 +50,11 @@ export function clearReusePayload(): void {
   } catch {}
 }
 
+// 履歴再利用
 export function getTypedReusePayloadOnce<T>(
   typeId: string,
-  isValid: (v: unknown) => v is T
+  isValid: (v: unknown) => v is T,
+  sub?: "na" | "k"
 ): T | null {
   if (typeof window === "undefined") return null;
 
@@ -61,11 +63,13 @@ export function getTypedReusePayloadOnce<T>(
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
+    console.log("パース結果", parsed);
     if (
       parsed &&
       typeof parsed === "object" &&
       "typeId" in parsed &&
       parsed.typeId === typeId &&
+      (sub ? parsed.sub === sub : true) &&
       "inputs" in parsed &&
       isValid(parsed.inputs)
     ) {

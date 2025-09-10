@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
@@ -14,15 +14,17 @@ export default function KCorrectionForm() {
   const [ph, setPh] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
-        useEffect(() => {
-         const data = getTypedReusePayloadOnce<KCorrectionInputs>(
-           "electrolyte",
-           isKCorrectionInputs
-         );
-          if (!data)return;
-             setK(String(data.k));
-            setPh(String(data.ph));
-        }, []);
+  useEffect(() => {
+    const data = getTypedReusePayloadOnce<KCorrectionInputs>(
+      "electrolyte",
+      isKCorrectionInputs,
+      "k"
+    );
+    console.log("K補正: reusePayload取得", data);
+    if (!data) return;
+    setK(String(data.k));
+    setPh(String(data.ph));
+  }, []);
 
   const calculate = () => {
     const measuredK = parseFloat(k);
@@ -43,9 +45,9 @@ export default function KCorrectionForm() {
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",
-      sub:"k",
+      sub: "k",
       typeName: "電解質補正",
-      inputs: { k:measuredK, ph:pH },
+      inputs: { k: Number(k), ph: Number(ph) },
       result: { correctedK: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

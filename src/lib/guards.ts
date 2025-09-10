@@ -10,7 +10,7 @@ import type {
   KCorrectionInputs,
   TransfusionInputs,
   OxygenInputs,
-  BmiInputs
+  BmiInputs,
 } from "@/types/inputs";
 import { patientConditions } from "@/config/patientConditions";
 import type { PatientCondition } from "@/types/patient";
@@ -64,13 +64,16 @@ export function isNaCorrectionInputs(v: unknown): v is NaCorrectionInputs {
   return !!o && isNumber(o.na) && isNumber(o.glucose);
 }
 export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
+  // console.log("isKCorrectionInputsチェック", v);
   const o = v as Partial<KCorrectionInputs> | null | undefined;
   return !!o && isNumber(o.k) && isNumber(o.ph);
 }
 // 輸血
 export function isTransfusionInput(v: unknown): v is TransfusionInputs {
   const o = v as Partial<TransfusionInputs> | null | undefined;
-  return !!o && isNumber(o.weight) && isNumber(o.currentHb) && isNumber(o.targetHb);
+  return (
+    !!o && isNumber(o.weight) && isNumber(o.currentHb) && isNumber(o.targetHb)
+  );
 }
 // 酸素
 export function isOxygenInputs(v: unknown): v is OxygenInputs {

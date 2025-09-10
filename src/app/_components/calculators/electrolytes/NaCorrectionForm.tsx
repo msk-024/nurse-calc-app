@@ -17,7 +17,8 @@ export default function NaCorrectionForm() {
 useEffect(() => {
   const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
     "electrolyte",
-    isNaCorrectionInputs
+    isNaCorrectionInputs,
+    "na"
   );
   if (!data) return;
 

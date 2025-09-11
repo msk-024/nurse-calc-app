@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
@@ -14,19 +14,18 @@ export default function NaCorrectionForm() {
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
-useEffect(() => {
-  const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
-    "electrolyte",
-    isNaCorrectionInputs,
-    "na"
-  );
-  if (!data) return;
+  useEffect(() => {
+    const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
+      "electrolyte",
+      isNaCorrectionInputs
+    );
+    console.log("Na補正: reusePayload取得", data);
+    if (!data) return;
 
-  setNa(String(data.na));
-  setGlucose(String(data.glucose));
-}, []);
+    setNa(String(data.na));
+    setGlucose(String(data.glucose));
+  }, []);
 
-  
   const calculate = () => {
     const measuredNa = parseFloat(na);
     const glucoseLevel = parseFloat(glucose);
@@ -45,9 +44,9 @@ useEffect(() => {
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",
-      sub:"na",
+      sub: "na",
       typeName: "電解質補正",
-      inputs: { na:measuredNa, glucose:glucoseLevel },
+      inputs: { na: measuredNa, glucose: glucoseLevel },
       result: { correctedNa: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

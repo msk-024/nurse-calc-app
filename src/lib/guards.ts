@@ -27,6 +27,11 @@ export function isPatientCondition(v: unknown): v is PatientCondition {
     typeof v === "string" && conditionValues.includes(v as PatientCondition)
   );
 }
+const isNumberLike = (v: unknown): boolean => {
+  if (typeof v === "number") return !Number.isNaN(v);
+  if (typeof v === "string") return v.trim() !== "" && !Number.isNaN(Number(v));
+  return false;
+};
 
 // 各計算の型ガード
 // 投薬
@@ -63,11 +68,29 @@ export function isNaCorrectionInputs(v: unknown): v is NaCorrectionInputs {
   const o = v as Partial<NaCorrectionInputs> | null | undefined;
   return !!o && isNumber(o.na) && isNumber(o.glucose);
 }
+
+// export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
+//   const o = v as Partial<KCorrectionInputs> | null | undefined;
+//   return !!o && isNumberLike(o.k) && isNumberLike(o.ph);
+// }
 export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
-  // console.log("isKCorrectionInputsチェック", v);
   const o = v as Partial<KCorrectionInputs> | null | undefined;
-  return !!o && isNumber(o.k) && isNumber(o.ph);
+  const isK = isNumberLike(o?.k);
+  const isPh = isNumberLike(o?.ph);
+  const result = !!o && isK && isPh;
+  console.log("🧪 isKCorrectionInputs チェック", {
+    v,
+    k: o?.k,
+    ph: o?.ph,
+    isK: isNumber(o?.k),
+    isPh: isNumber(o?.ph),
+    result,
+  });
+  return result;
 }
+
+
+
 // 輸血
 export function isTransfusionInput(v: unknown): v is TransfusionInputs {
   const o = v as Partial<TransfusionInputs> | null | undefined;

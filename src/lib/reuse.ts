@@ -64,12 +64,23 @@ export function getTypedReusePayloadOnce<T>(
 
     const parsed = JSON.parse(raw);
     console.log("パース結果", parsed);
+    console.log("typeId一致:", parsed.typeId === typeId);
+    console.log("🚨 呼び出し元sub =", sub, "（型:", typeof sub, "）");
+    console.log(
+      "🧩 取得データ.sub =",
+      parsed.sub,
+      "（型:",
+      typeof parsed.sub,
+      "）"
+    );
+    console.log("inputs検証:", isValid(parsed.inputs));
+    console.log(typeof parsed.inputs.k);
     if (
       parsed &&
       typeof parsed === "object" &&
       "typeId" in parsed &&
       parsed.typeId === typeId &&
-      (sub ? parsed.sub === sub : true) &&
+      (parsed.sub ? parsed.sub === sub : true) &&
       "inputs" in parsed &&
       isValid(parsed.inputs)
     ) {

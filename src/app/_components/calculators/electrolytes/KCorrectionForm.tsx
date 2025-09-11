@@ -8,6 +8,7 @@ import { ResultBox } from "../../ResultBox";
 import { getTypedReusePayloadOnce } from "@/lib/reuse";
 import { isKCorrectionInputs } from "@/lib/guards";
 import type { KCorrectionInputs } from "@/types/inputs";
+import { setReusePayload } from "@/lib/reuse";
 
 export default function KCorrectionForm() {
   const [k, setK] = useState("");
@@ -22,6 +23,7 @@ export default function KCorrectionForm() {
     );
     console.log("K補正: reusePayload取得", data);
     if (!data) return;
+
     setK(String(data.k));
     setPh(String(data.ph));
   }, []);
@@ -47,10 +49,16 @@ export default function KCorrectionForm() {
       typeId: "electrolyte",
       sub: "k",
       typeName: "電解質補正",
-      inputs: { k: Number(k), ph: Number(ph) },
+      inputs: { k: measuredK, ph: pH },
       result: { correctedK: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
+    });
+    setReusePayload({
+      typeId: "electrolyte",
+      sub: "k",
+      inputs: { k: measuredK, ph: pH },
+      timestamp: new Date().toISOString(), // ISO形式でもローカル形式でも可
     });
   };
 

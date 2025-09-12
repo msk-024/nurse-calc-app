@@ -69,27 +69,10 @@ export function isNaCorrectionInputs(v: unknown): v is NaCorrectionInputs {
   return !!o && isNumber(o.na) && isNumber(o.glucose);
 }
 
-// export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
-//   const o = v as Partial<KCorrectionInputs> | null | undefined;
-//   return !!o && isNumberLike(o.k) && isNumberLike(o.ph);
-// }
 export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
   const o = v as Partial<KCorrectionInputs> | null | undefined;
-  const isK = isNumberLike(o?.k);
-  const isPh = isNumberLike(o?.ph);
-  const result = !!o && isK && isPh;
-  console.log("🧪 isKCorrectionInputs チェック", {
-    v,
-    k: o?.k,
-    ph: o?.ph,
-    isK: isNumber(o?.k),
-    isPh: isNumber(o?.ph),
-    result,
-  });
-  return result;
+  return !!o && isNumberLike(o.k) && isNumberLike(o.ph);
 }
-
-
 
 // 輸血
 export function isTransfusionInput(v: unknown): v is TransfusionInputs {

@@ -51,6 +51,49 @@ export function clearReusePayload(): void {
 }
 
 // 履歴再利用
+// export function getTypedReusePayloadOnce<T>(
+//   typeId: string,
+//   isValid: (v: unknown) => v is T,
+//   sub?: "na" | "k"
+// ): T | null {
+//   if (typeof window === "undefined") return null;
+
+//   try {
+//     const raw = localStorage.getItem("reusePayload");
+//     if (!raw) return null;
+
+//     const parsed = JSON.parse(raw);
+//     console.log("パース結果", parsed);
+//     console.log("typeId一致:", parsed.typeId === typeId);
+//     console.log("🚨 呼び出し元sub =", sub, "（型:", typeof sub, "）");
+//     console.log(
+//       "🧩 取得データ.sub =",
+//       parsed.sub,
+//       "（型:",
+//       typeof parsed.sub,
+//       "）"
+//     );
+//     console.log("inputs検証:", isValid(parsed.inputs));
+//     console.log(typeof parsed.inputs.k);
+//     if (
+//       parsed &&
+//       typeof parsed === "object" &&
+//       "typeId" in parsed &&
+//       parsed.typeId === typeId &&
+//       (parsed.sub ? parsed.sub === sub : true) &&
+//       "inputs" in parsed &&
+//       isValid(parsed.inputs)
+//     ) {
+//       localStorage.removeItem("reusePayload");
+//       return parsed.inputs;
+//     }
+
+//     return null;
+//   } catch {
+//     return null;
+//   }
+// }
+
 export function getTypedReusePayloadOnce<T>(
   typeId: string,
   isValid: (v: unknown) => v is T,
@@ -63,29 +106,36 @@ export function getTypedReusePayloadOnce<T>(
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
-    console.log("パース結果", parsed);
-    console.log("typeId一致:", parsed.typeId === typeId);
-    console.log("🚨 呼び出し元sub =", sub, "（型:", typeof sub, "）");
-    console.log(
-      "🧩 取得データ.sub =",
-      parsed.sub,
-      "（型:",
-      typeof parsed.sub,
-      "）"
-    );
-    console.log("inputs検証:", isValid(parsed.inputs));
-    console.log(typeof parsed.inputs.k);
+    // console.log("パース結果", parsed);
+    // console.log("typeId一致:", parsed.typeId === typeId);
+    // console.log("🚨 呼び出し元sub =", sub, "（型:", typeof sub, "）");
+    // console.log("🧩 取得データ.sub =", parsed.sub, "（型:", typeof parsed.sub, "）");
+    // console.log("inputs検証:", isValid(parsed.inputs));
+
+    const subOk = parsed.sub ? parsed.sub === sub : true;
     if (
       parsed &&
       typeof parsed === "object" &&
-      "typeId" in parsed &&
       parsed.typeId === typeId &&
-      (parsed.sub ? parsed.sub === sub : true) &&
-      "inputs" in parsed &&
-      isValid(parsed.inputs)
+      subOk &&
+      "inputs" in parsed
     ) {
-      localStorage.removeItem("reusePayload");
-      return parsed.inputs;
+      if (isValid(parsed.inputs)) {
+        localStorage.removeItem("reusePayload");
+        return parsed.inputs as T;
+      }
+
+      // フォールバック: K補正だけ緩く受け入れる
+      if (sub === "k") {
+        type MaybeKInputs = { k: unknown; ph: unknown };
+        const inp = parsed.inputs as MaybeKInputs;
+        if (inp && typeof inp === "object" && "k" in inp && "ph" in inp) {
+          const k = Number(inp.k);
+          const ph = Number(inp.ph);
+          localStorage.removeItem("reusePayload");
+          return { k, ph } as T;
+        }
+      }
     }
 
     return null;

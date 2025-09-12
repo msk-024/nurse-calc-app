@@ -2,7 +2,6 @@ import Image from "next/image";
 import { HistoryItem } from "@/types/history";
 import { getCalculatorById } from "@/config/calculators";
 import { useRouter } from "next/navigation";
-// import { setReusePayload } from "@/lib/reuse";
 
 type HistoryListProps = {
   items: HistoryItem[];
@@ -40,7 +39,7 @@ export default function HistoryList({ items }: HistoryListProps) {
             key={item.id}
             className="flex justify-between items-center gap-2 md:gap-4 p-3 rounded-md bg-white shadow-sm border"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-3/4">
               {calc && (
                 <Image
                   src={calc.iconPath}

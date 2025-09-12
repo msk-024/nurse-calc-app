@@ -2,13 +2,15 @@
 import { useState, useEffect } from "react";
 import NaCorrectionForm from "./NaCorrectionForm";
 import KCorrectionForm from "./KCorrectionForm";
-import { getReusePayloadOnce } from "@/lib/reuse";
+// import { getReusePayloadOnce } from "@/lib/reuse";
+import { getReusePayload } from "@/lib/reuse";
 
 export default function ElectrolyteCorrectionCalculator() {
   const [tab, setTab] = useState<"na" | "k">("na");
 
   useEffect(() => {
-    const reuse = getReusePayloadOnce();
+    // const reuse = getReusePayloadOnce();
+    const reuse = getReusePayload(); // 取得のみでクリアしない
     if (
       reuse?.typeId === "electrolyte" &&
       (reuse.sub === "na" || reuse.sub === "k")

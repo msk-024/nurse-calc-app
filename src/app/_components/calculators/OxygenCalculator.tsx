@@ -1,50 +1,53 @@
 // 酸素投与量計算
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { oxygenDevices } from "@/config/oxygenDevices";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getTypedReusePayloadOnce } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isOxygenInputs } from "@/lib/guards";
 import type { OxygenInputs } from "@/types/inputs";
 
 export default function OxygenCalculator() {
-    const [deviceId, setDeviceId] = useState("nasal_cannula");
-    const [flow, setFlow] = useState("");
-    const [result, setResult] = useState<string | null>(null);
+  const [deviceId, setDeviceId] = useState("nasal_cannula");
+  const [flow, setFlow] = useState("");
+  const [result, setResult] = useState<string | null>(null);
 
-useEffect(() => {
-  const data = getTypedReusePayloadOnce<OxygenInputs>("oxygen", isOxygenInputs);
-  if (!data) return;
+  useEffect(() => {
+    const data = getTypedReusePayloadOnce<OxygenInputs>(
+      "oxygen",
+      isOxygenInputs
+    );
+    if (!data) return;
 
-  const { deviceId, flow } = data;
+    const { deviceId, flow } = data;
 
-  setDeviceId(String(deviceId));
-  if (flow != null) setFlow(String(flow)); // flow は任意
-}, []);
+    setDeviceId(String(deviceId));
+    if (flow != null) setFlow(String(flow)); // flow は任意
+  }, []);
 
-    const selectedDevice = oxygenDevices.find((d) => d.id === deviceId);
+  const selectedDevice = oxygenDevices.find((d) => d.id === deviceId);
 
-    const calculateFiO2 = () => {
-        const flowRate = parseFloat(flow);
-        if (!selectedDevice) {
-            alert("デバイスが選択されていません");
-        return;
-        }
+  const calculateFiO2 = () => {
+    const flowRate = parseFloat(flow);
+    if (!selectedDevice) {
+      alert("デバイスが選択されていません");
+      return;
+    }
 
     let fiO2: number;
 
     if (selectedDevice.estimateFiO2Function && flow) {
-            fiO2 = selectedDevice.estimateFiO2Function(flowRate);
-        } else if (selectedDevice.estimatedFiO2 !== undefined) {
-            fiO2 = selectedDevice.estimatedFiO2;
-        } else {
-            alert("このデバイスには FiO₂ 推定方法が定義されていません");
-        return;
+      fiO2 = selectedDevice.estimateFiO2Function(flowRate);
+    } else if (selectedDevice.estimatedFiO2 !== undefined) {
+      fiO2 = selectedDevice.estimatedFiO2;
+    } else {
+      alert("このデバイスには FiO₂ 推定方法が定義されていません");
+      return;
     }
 
     setResult(fiO2.toFixed(0));

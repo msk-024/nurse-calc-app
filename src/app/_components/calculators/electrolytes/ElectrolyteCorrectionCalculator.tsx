@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import NaCorrectionForm from "./NaCorrectionForm";
 import KCorrectionForm from "./KCorrectionForm";
 // import { getReusePayloadOnce } from "@/lib/reuse";
-import { getReusePayload } from "@/lib/reuse";
+import { getReusePayload } from "@/lib/reuse/reuse";
 
 export default function ElectrolyteCorrectionCalculator() {
   const [tab, setTab] = useState<"na" | "k">("na");

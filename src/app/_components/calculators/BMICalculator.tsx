@@ -1,11 +1,11 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
-import { getTypedReusePayloadOnce } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isBmiInputs } from "@/lib/guards";
 import type { BmiInputs } from "@/types/inputs";
 
@@ -14,22 +14,20 @@ export default function BMICalculator() {
   const [weight, setWeight] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
-  
-useEffect(() => {
-  const data = getTypedReusePayloadOnce<BmiInputs>("bmi", isBmiInputs);
-  if (!data) return;
+  useEffect(() => {
+    const data = getTypedReusePayloadOnce<BmiInputs>("bmi", isBmiInputs);
+    if (!data) return;
 
-  setHeight(String(data.height));
-  setWeight(String(data.weight));
-}, []);
-
+    setHeight(String(data.height));
+    setWeight(String(data.weight));
+  }, []);
 
   const calculate = () => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
     if (!h || !w || h <= 0 || w <= 0) {
-        alert("正しい身長と体重を入力してください");
-        return;
+      alert("正しい身長と体重を入力してください");
+      return;
     }
 
     const bmi = w / (h / 100) ** 2;
@@ -37,15 +35,15 @@ useEffect(() => {
     setResult(bmiRounded.toString());
 
     saveHistory({
-        id: Date.now(),
-        typeId: "bmi",
-        typeName: "BMI計算",
-        inputs: { height: h, weight: w },
-        result: { bmi: bmiRounded },
-        resultSummary: `BMI: ${bmiRounded}`,
-        timestamp: new Date().toLocaleString("ja-JP"),
+      id: Date.now(),
+      typeId: "bmi",
+      typeName: "BMI計算",
+      inputs: { height: h, weight: w },
+      result: { bmi: bmiRounded },
+      resultSummary: `BMI: ${bmiRounded}`,
+      timestamp: new Date().toLocaleString("ja-JP"),
     });
-};
+  };
 
   return (
     <div className="space-y-6">

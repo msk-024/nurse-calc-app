@@ -9,7 +9,7 @@ import {
   isOxygenInputs,
   isBmiInputs,
   isBsaInputs,
-} from "./guards";
+} from "../guards";
 
 export const reuseValidators = {
   medication: isMedicationInputs,

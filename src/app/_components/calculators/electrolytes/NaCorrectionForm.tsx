@@ -5,7 +5,7 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
-import { getTypedReusePayloadOnce } from "@/lib/reuse";
+import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isNaCorrectionInputs } from "@/lib/guards";
 import type { NaCorrectionInputs } from "@/types/inputs";
 

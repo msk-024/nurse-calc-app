@@ -7,7 +7,7 @@ import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isTransfusionInput } from "@/lib/guards";
+import { isTransfusionInputs } from "@/lib/guards";
 import type { TransfusionInputs } from "@/types/inputs";
 
 export default function TransfusionCalculator() {
@@ -19,7 +19,7 @@ export default function TransfusionCalculator() {
   useEffect(() => {
     const data = getTypedReusePayloadOnce<TransfusionInputs>(
       "transfusion",
-      isTransfusionInput
+      isTransfusionInputs
     );
     if (!data) return;
     const { weight, currentHb, targetHb } = data;

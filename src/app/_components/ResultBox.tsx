@@ -52,12 +52,12 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
   const helpText = typeId ? helpTexts[typeId] : null;
 
   return (
-    <div className={`border rounded p-4 ${bg}`}>
+    <div className={`rounded p-4 ${bg} relative`}>
       {/* タイトルとヘルプアイコン */}
       <div className="flex items-start justify-between">
         <h3 className="font-semibold">{title}</h3>
         {helpText && (
-          <Popover className="relative">
+          <Popover>
             <Popover.Button aria-label="注意説明">
               <Image
                 src="/icons/help-icon.svg"
@@ -67,8 +67,10 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
                 className="cursor-pointer"
               />
             </Popover.Button>
-
-            <Popover.Panel className="absolute z-10 mt-2 right-0 top-0 w-64 p-3 bg-white border rounded shadow-md text-sm text-gray-700">
+            <Popover.Panel
+              className={`absolute left-0 top-full w-full p-3 ${bg} border-t-0 rounded-t-none shadow-md text-sm`}
+              role="dialog"
+            ><h4 className="underline mb-2">注意事項</h4>
               {helpText}
             </Popover.Panel>
           </Popover>

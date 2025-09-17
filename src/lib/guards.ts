@@ -75,7 +75,7 @@ export function isKCorrectionInputs(v: unknown): v is KCorrectionInputs {
 }
 
 // 輸血
-export function isTransfusionInput(v: unknown): v is TransfusionInputs {
+export function isTransfusionInputs(v: unknown): v is TransfusionInputs {
   const o = v as Partial<TransfusionInputs> | null | undefined;
   return (
     !!o && isNumber(o.weight) && isNumber(o.currentHb) && isNumber(o.targetHb)

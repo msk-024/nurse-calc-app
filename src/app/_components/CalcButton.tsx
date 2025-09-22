@@ -14,7 +14,7 @@ export default function CalcButton({ calc, active, onClick }: CalcButtonProps) {
       aria-pressed={active}
       className={[
         // 基本の表示
-        "relative inline-flex items-center gap-2 rounded-lg px-6 py-4 font-semibold text-white",
+        "relative inline-flex items-center gap-2 rounded-lg px-6 py-4 font-semibold text-white tracking-widest",
         "transition-all duration-150 will-change-[box-shadow,filter]",
         calc.color,
         !active &&

@@ -34,7 +34,7 @@ export default function RootLayout({
           ${geistSans.variable} 
           ${geistMono.variable} 
           antialiased 
-          bg-white text-gray-900 
+          bg-neutral-50 text-gray-900 
           dark:bg-gray-900 dark:text-gray-100
         `}
       >

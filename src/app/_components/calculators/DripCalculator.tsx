@@ -1,12 +1,13 @@
 // 点滴計算
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isDripInputs } from "@/lib/guards";
 import type { DripInputs } from "@/types/inputs";
@@ -19,6 +20,7 @@ export default function DripCalculator() {
     mlPerHour: string;
     dropsPerMin: string;
   }>(null);
+   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<DripInputs>("drip", isDripInputs);
@@ -47,6 +49,9 @@ export default function DripCalculator() {
     };
 
     setResult(newResult);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `輸液速度 ${newResult.mlPerHour} mL/時・滴下数 ${newResult.dropsPerMin}滴/分`;
 
@@ -100,6 +105,7 @@ export default function DripCalculator() {
 
       {/* 結果表示 */}
       {result && (
+        <div ref={resultRef}>
         <ResultBox
           color="blue"
           results={[
@@ -108,6 +114,7 @@ export default function DripCalculator() {
           ]}
           typeId="drip"
         />
+        </div>
       )}
     </div>
   );

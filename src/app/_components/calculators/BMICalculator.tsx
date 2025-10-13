@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isBmiInputs } from "@/lib/guards";
 import type { BmiInputs } from "@/types/inputs";
@@ -13,7 +14,7 @@ export default function BMICalculator() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [result, setResult] = useState<string | null>(null);
-
+  const resultRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const data = getTypedReusePayloadOnce<BmiInputs>("bmi", isBmiInputs);
     if (!data) return;
@@ -33,6 +34,9 @@ export default function BMICalculator() {
     const bmi = w / (h / 100) ** 2;
     const bmiRounded = Math.floor(bmi);
     setResult(bmiRounded.toString());
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     saveHistory({
       id: Date.now(),
@@ -69,12 +73,14 @@ export default function BMICalculator() {
       <SubmitButton onClick={calculate} color="bg-orange-500" />
 
       {result && (
-        <ResultBox
-          color="orange"
-          results={[{ label: "BMI", value: result, unit: "" }]}
-          note="※ BMIは目安です。個人差があるため臨床判断と併用してください。"
-          typeId="bmi"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="orange"
+            results={[{ label: "BMI", value: result, unit: "" }]}
+            note="※ BMIは目安です。個人差があるため臨床判断と併用してください。"
+            typeId="bmi"
+          />
+        </div>
       )}
     </div>
   );

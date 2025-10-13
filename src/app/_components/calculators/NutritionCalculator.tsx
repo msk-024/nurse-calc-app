@@ -1,7 +1,7 @@
 // 栄養計算
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { nutritionFactors } from "@/config/nutritionFactors";
 import type { PatientCondition } from "@/types/patient";
@@ -9,6 +9,7 @@ import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { patientConditions } from "@/config/patientConditions";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isNutritionInputs } from "@/lib/guards";
@@ -22,6 +23,7 @@ export default function NutritionCalculator() {
     protein: string;
     water: string;
   }>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<NutritionInputs>(
@@ -50,6 +52,9 @@ export default function NutritionCalculator() {
     };
 
     setResult(resultData);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `エネルギー ${resultData.calorie} kcal / タンパク質 ${resultData.protein} g / 水分量 ${resultData.water} mL`;
 
@@ -88,7 +93,7 @@ export default function NutritionCalculator() {
       <SubmitButton onClick={calculate} color="bg-amber-500" />
 
       {result && (
-        <>
+        <div ref={resultRef}>
           <ResultBox
             color="amber"
             results={[
@@ -105,7 +110,7 @@ export default function NutritionCalculator() {
               状態に応じた調整が必要です。
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

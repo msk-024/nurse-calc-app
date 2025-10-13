@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isNaCorrectionInputs } from "@/lib/guards";
 import type { NaCorrectionInputs } from "@/types/inputs";
@@ -13,7 +14,7 @@ export default function NaCorrectionForm() {
   const [na, setNa] = useState("");
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
-
+ const resultRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
       "electrolyte",
@@ -39,6 +40,9 @@ export default function NaCorrectionForm() {
     const correctedNa = measuredNa + 0.016 * (glucoseLevel - 100);
     const formatted = correctedNa.toFixed(2);
     setResult(formatted);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `補正Na ${formatted} mEq/L`;
 
@@ -76,12 +80,14 @@ export default function NaCorrectionForm() {
       <SubmitButton onClick={calculate} color="bg-cyan-500" />
 
       {result && (
+        <div ref={resultRef}>
         <ResultBox
           color="cyan"
           results={[{ label: "補正Na", value: result, unit: "mEq/L" }]}
           note="※ Katzの式：補正Na = 測定Na + 0.016 × (血糖値 - 100)"
           typeId="electrolyte-na"
         />
+        </div>
       )}
     </div>
   );

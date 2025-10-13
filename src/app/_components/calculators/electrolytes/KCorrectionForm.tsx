@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isKCorrectionInputs } from "@/lib/guards";
 import type { KCorrectionInputs } from "@/types/inputs";
@@ -14,6 +15,7 @@ export default function KCorrectionForm() {
   const [k, setK] = useState("");
   const [ph, setPh] = useState("");
   const [result, setResult] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<KCorrectionInputs>(
@@ -41,6 +43,9 @@ export default function KCorrectionForm() {
     const correctedK = measuredK + 0.6 * (7.4 - pH);
     const formatted = correctedK.toFixed(1);
     setResult(formatted);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `補正K ${formatted} mEq/L`;
 
@@ -84,12 +89,14 @@ export default function KCorrectionForm() {
       <SubmitButton onClick={calculate} color="bg-cyan-500" />
 
       {result && (
-        <ResultBox
-          color="cyan"
-          results={[{ label: "補正K", value: result, unit: "mEq/L" }]}
-          note="※ Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)"
-          typeId="electrolyte-k"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="cyan"
+            results={[{ label: "補正K", value: result, unit: "mEq/L" }]}
+            note="※ Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)"
+            typeId="electrolyte-k"
+          />
+        </div>
       )}
     </div>
   );

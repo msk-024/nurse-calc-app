@@ -1,13 +1,14 @@
 // 酸素投与量計算
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { oxygenDevices } from "@/config/oxygenDevices";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isOxygenInputs } from "@/lib/guards";
 import type { OxygenInputs } from "@/types/inputs";
@@ -16,6 +17,7 @@ export default function OxygenCalculator() {
   const [deviceId, setDeviceId] = useState("nasal_cannula");
   const [flow, setFlow] = useState("");
   const [result, setResult] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<OxygenInputs>(
@@ -51,6 +53,9 @@ export default function OxygenCalculator() {
     }
 
     setResult(fiO2.toFixed(0));
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     // ✅ 履歴に保存
     saveHistory({
@@ -91,12 +96,14 @@ export default function OxygenCalculator() {
       </div>
       <SubmitButton onClick={calculateFiO2} color="bg-teal-500" />
       {result && (
-        <ResultBox
-          color="teal"
-          results={[{ label: "推定 FiO₂", value: result, unit: "%" }]}
-          note={`※ FiO₂の値は代表的な推定値です。\n※ 実際の酸素濃度を保証するものではありません。目安としてご使用ください。\n ※ 患者の呼吸状態やマスクのフィット感により変動します。`}
-          typeId="oxygen"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="teal"
+            results={[{ label: "推定 FiO₂", value: result, unit: "%" }]}
+            note={`※ FiO₂の値は代表的な推定値です。\n※ 実際の酸素濃度を保証するものではありません。目安としてご使用ください。\n ※ 患者の呼吸状態やマスクのフィット感により変動します。`}
+            typeId="oxygen"
+          />
+        </div>
       )}
     </div>
   );

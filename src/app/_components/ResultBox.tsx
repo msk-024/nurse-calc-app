@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
 import { helpTexts } from "@/config/helpTexts";
+import { scrollToRef } from "@/lib/scrollToRef";
 
 interface ResultItem {
   label: string;
@@ -56,18 +57,14 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (isOpen && panelRef.current) {
-      panelRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (isOpen) {
+      scrollToRef(panelRef);
     }
   }, [isOpen]);
 
   return (
     <Disclosure>
       {({ open }) => {
-        // open の状態を外の state に反映
         if (open !== isOpen) setTimeout(() => setIsOpen(open), 0);
 
         return (
@@ -80,8 +77,8 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
                   <Image
                     src="/icons/help-icon.svg"
                     alt="注意"
-                    width={20}
-                    height={20}
+                    width={28}
+                    height={28}
                     className="cursor-pointer"
                   />
                 </Disclosure.Button>
@@ -89,10 +86,12 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
             </div>
 
             {/* 結果リスト */}
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {results.map((item, i) => (
-                <li key={i}>
-                  {item.label}: <strong>{item.value}</strong> {item.unit}
+                <li key={i} className="flex items-baseline gap-2">
+                  <span className="text-base">{item.label}:</span>
+                  <strong className="text-2xl">{item.value}</strong>
+                  <span className="text-sm">{item.unit}</span>
                 </li>
               ))}
             </ul>

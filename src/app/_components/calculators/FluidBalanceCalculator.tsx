@@ -1,10 +1,11 @@
 // 体液計算
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isFluidInputs } from "@/lib/guards";
 import type { FluidInputs } from "@/types/inputs";
@@ -22,6 +23,7 @@ export default function FluidBalanceCalculator() {
     estimatedFluid: string;
     status: string;
   }>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<FluidInputs>("fluid", isFluidInputs);
@@ -75,6 +77,9 @@ export default function FluidBalanceCalculator() {
     };
 
     setResult(calcResult);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `体重${calcResult.weightChange}kg / 水分${calcResult.fluidBalance}mL (${status})`;
 
@@ -158,16 +163,22 @@ export default function FluidBalanceCalculator() {
       <SubmitButton onClick={calculate} color="bg-green-500" />
 
       {result && (
-        <ResultBox
-          color="green"
-          results={[
-            { label: "体重変化", value: result.weightChange, unit: "kg" },
-            { label: "水分バランス", value: result.fluidBalance, unit: "mL" },
-            { label: "推定体液変動", value: result.estimatedFluid, unit: "mL" },
-            { label: "評価", value: result.status, unit: "" },
-          ]}
-          typeId="fluid"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="green"
+            results={[
+              { label: "体重変化", value: result.weightChange, unit: "kg" },
+              { label: "水分バランス", value: result.fluidBalance, unit: "mL" },
+              {
+                label: "推定体液変動",
+                value: result.estimatedFluid,
+                unit: "mL",
+              },
+              { label: "評価", value: result.status, unit: "" },
+            ]}
+            typeId="fluid"
+          />
+        </div>
       )}
     </div>
   );

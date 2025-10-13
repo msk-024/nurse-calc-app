@@ -1,11 +1,12 @@
 // 輸血計算
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isTransfusionInputs } from "@/lib/guards";
 import type { TransfusionInputs } from "@/types/inputs";
@@ -15,6 +16,7 @@ export default function TransfusionCalculator() {
   const [currentHb, setCurrentHb] = useState("");
   const [targetHb, setTargetHb] = useState("");
   const [result, setResult] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<TransfusionInputs>(
@@ -48,6 +50,8 @@ export default function TransfusionCalculator() {
     const units = ((thb - chb) * w * 0.3) / 200;
     const roundedUnits = Math.ceil(units); // 繰り上げで表示
     setResult(roundedUnits.toString());
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `RCC輸血 単位数: ${roundedUnits} 単位`;
 
@@ -93,12 +97,14 @@ export default function TransfusionCalculator() {
       <SubmitButton onClick={calculate} color="bg-rose-500" />
 
       {result && (
-        <ResultBox
-          color="rose"
-          results={[{ label: "推定単位数", value: result, unit: "単位" }]}
-          note={`※ 本計算は赤血球濃厚液（RCC）を対象としています。\n※ 実際の輸血適応は臨床判断により決定されます。`}
-          typeId="transfusion"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="rose"
+            results={[{ label: "推定単位数", value: result, unit: "単位" }]}
+            note={`※ 本計算は赤血球濃厚液（RCC）を対象としています。\n※ 実際の輸血適応は臨床判断により決定されます。`}
+            typeId="transfusion"
+          />
+        </div>
       )}
     </div>
   );

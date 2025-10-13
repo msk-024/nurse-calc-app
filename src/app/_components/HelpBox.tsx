@@ -7,7 +7,7 @@ import { helpTexts } from "@/config/helpTexts";
 interface HelpBoxProps {
   typeId?: string;
   bg: string;
-  showPanelBelow?: boolean; 
+  showPanelBelow?: boolean;
 }
 
 export const HelpBox: React.FC<HelpBoxProps> = ({
@@ -28,8 +28,8 @@ export const HelpBox: React.FC<HelpBoxProps> = ({
             <Image
               src="/icons/help-icon.svg"
               alt="注意"
-              width={20}
-              height={20}
+              width={28}
+              height={28}
               className="cursor-pointer"
             />
           </Disclosure.Button>

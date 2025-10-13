@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
 import { ResultBox } from "../ResultBox";
+import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isMedicationInputs } from "@/lib/guards";
 import type { MedicationInputs } from "@/types/inputs";
@@ -14,10 +15,11 @@ export default function MedicationCalculator() {
   const [weight, setWeight] = useState(""); // 体重 (kg)
   const [dose, setDose] = useState(""); // 投与量 (mg/kg)
   const [concentration, setConcentration] = useState(""); // 濃度 (mg/mL)
-  const [result, setResult] = useState<{
+  const [result, setResult] = useState<null | {
     totalDose: string;
     volume: string;
   } | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<MedicationInputs>(
@@ -49,6 +51,9 @@ export default function MedicationCalculator() {
     };
 
     setResult(calcResult);
+
+    // スクロール
+    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `総投与量 ${calcResult.totalDose}mg・薬液量 ${calcResult.volume}mL`;
 
@@ -92,14 +97,16 @@ export default function MedicationCalculator() {
       <SubmitButton onClick={calculate} color="bg-yellow-500" />
 
       {result && (
-        <ResultBox
-          color="yellow"
-          results={[
-            { label: "総投与量", value: result.totalDose, unit: "mg" },
-            { label: "薬液量", value: result.volume, unit: "mL" },
-          ]}
-          typeId="medication"
-        />
+        <div ref={resultRef}>
+          <ResultBox
+            color="yellow"
+            results={[
+              { label: "総投与量", value: result.totalDose, unit: "mg" },
+              { label: "薬液量", value: result.volume, unit: "mL" },
+            ]}
+            typeId="medication"
+          />
+        </div>
       )}
     </div>
   );

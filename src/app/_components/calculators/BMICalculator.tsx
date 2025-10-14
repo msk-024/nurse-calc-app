@@ -9,12 +9,14 @@ import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isBmiInputs } from "@/lib/guards";
 import type { BmiInputs } from "@/types/inputs";
+import { normalRanges } from "@/config/normalRanges";
 
 export default function BMICalculator() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce<BmiInputs>("bmi", isBmiInputs);
     if (!data) return;
@@ -32,7 +34,7 @@ export default function BMICalculator() {
     }
 
     const bmi = w / (h / 100) ** 2;
-    const bmiRounded = Math.floor(bmi);
+    const bmiRounded = Math.round(bmi * 10) / 10; // ✅ 少数1桁で表示に変更
     setResult(bmiRounded.toString());
 
     // スクロール
@@ -76,7 +78,14 @@ export default function BMICalculator() {
         <div ref={resultRef}>
           <ResultBox
             color="orange"
-            results={[{ label: "BMI", value: result, unit: "" }]}
+            results={[
+              {
+                label: "BMI",
+                value: result,
+                unit: "",
+                range: normalRanges.bmi, // 基準値（18.5〜24.9）
+              },
+            ]}
             note="※ BMIは目安です。個人差があるため臨床判断と併用してください。"
             typeId="bmi"
           />

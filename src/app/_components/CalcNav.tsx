@@ -27,7 +27,7 @@ export default function CalcNav({
       </div>
       {/* モバイル：横スクロール（2列×2行を2ページ） */}
       <div className="md:hidden overflow-x-auto">
-        <div className="flex space-x-4 w-[max-content] px-1">
+        <div className="flex space-x-4 w-[max-content] px-1 pb-2">
           {[firstPage, secondPage].map((group, idx) => (
             <div
               key={idx}

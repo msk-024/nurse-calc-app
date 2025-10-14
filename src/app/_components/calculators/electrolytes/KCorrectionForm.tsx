@@ -6,10 +6,10 @@ import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
 import { ResultBox } from "../../ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
+import { getTypedReusePayloadOnce, setReusePayload } from "@/lib/reuse/reuse";
 import { isKCorrectionInputs } from "@/lib/guards";
 import type { KCorrectionInputs } from "@/types/inputs";
-import { setReusePayload } from "@/lib/reuse/reuse";
+import { normalRanges } from "@/config/normalRanges";
 
 export default function KCorrectionForm() {
   const [k, setK] = useState("");
@@ -39,7 +39,7 @@ export default function KCorrectionForm() {
       return;
     }
 
-    // 補正式：補正K = 実測K + 0.6 × (7.4 - pH)
+    // Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)
     const correctedK = measuredK + 0.6 * (7.4 - pH);
     const formatted = correctedK.toFixed(1);
     setResult(formatted);
@@ -59,11 +59,12 @@ export default function KCorrectionForm() {
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
     });
+
     setReusePayload({
       typeId: "electrolyte",
       sub: "k",
       inputs: { k: measuredK, ph: pH },
-      timestamp: new Date().toISOString(), // ISO形式でもローカル形式でも可
+      timestamp: new Date().toISOString(),
     });
   };
 
@@ -92,7 +93,14 @@ export default function KCorrectionForm() {
         <div ref={resultRef}>
           <ResultBox
             color="cyan"
-            results={[{ label: "補正K", value: result, unit: "mEq/L" }]}
+            results={[
+              {
+                label: "補正K",
+                value: result,
+                unit: "mEq/L",
+                range: normalRanges.potassium, // 基準値3.5〜5.0
+              },
+            ]}
             note="※ Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)"
             typeId="electrolyte-k"
           />

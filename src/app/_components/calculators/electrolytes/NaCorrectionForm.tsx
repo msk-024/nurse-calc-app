@@ -9,12 +9,14 @@ import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isNaCorrectionInputs } from "@/lib/guards";
 import type { NaCorrectionInputs } from "@/types/inputs";
+import { normalRanges } from "@/config/normalRanges";
 
 export default function NaCorrectionForm() {
   const [na, setNa] = useState("");
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
- const resultRef = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
       "electrolyte",
@@ -81,12 +83,19 @@ export default function NaCorrectionForm() {
 
       {result && (
         <div ref={resultRef}>
-        <ResultBox
-          color="cyan"
-          results={[{ label: "補正Na", value: result, unit: "mEq/L" }]}
-          note="※ Katzの式：補正Na = 測定Na + 0.016 × (血糖値 - 100)"
-          typeId="electrolyte-na"
-        />
+          <ResultBox
+            color="cyan"
+            results={[
+              {
+                label: "補正Na",
+                value: result,
+                unit: "mEq/L",
+                range: normalRanges.sodium,
+              },
+            ]}
+            note="※ Katzの式：補正Na = 測定Na + 0.016 × (血糖値 - 100)"
+            typeId="electrolyte-na"
+          />
         </div>
       )}
     </div>

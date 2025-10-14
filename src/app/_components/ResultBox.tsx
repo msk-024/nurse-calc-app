@@ -3,13 +3,20 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { helpTexts } from "@/config/helpTexts";
 import { scrollToRef } from "@/lib/scrollToRef";
+
+interface Range {
+  min: number;
+  max: number;
+}
 
 interface ResultItem {
   label: string;
   value: string | number;
   unit: string;
+  range?: Range;
 }
 
 interface ResultBoxProps {
@@ -53,14 +60,21 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
   const helpText = typeId ? helpTexts[typeId] : null;
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Disclosure の open 状態を追跡するための state
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      scrollToRef(panelRef);
-    }
+    if (isOpen) scrollToRef(panelRef);
   }, [isOpen]);
+
+  // ✅ 基準値チェック関数
+  const getStatusIcon = (value: number, range?: Range) => {
+    if (!range) return null;
+    if (value > range.max)
+      return <ArrowUp className="w-6 h-6 text-red-500 ml-1 inline-block" />;
+    if (value < range.min)
+      return <ArrowDown className="w-6 h-6 text-blue-500 ml-1 inline-block" />;
+    return null;
+  };
 
   return (
     <Disclosure>
@@ -87,20 +101,30 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
 
             {/* 結果リスト */}
             <ul className="space-y-2">
-              {results.map((item, i) => (
-                <li key={i} className="flex items-baseline gap-2">
-                  <span className="text-base">{item.label}:</span>
-                  <strong className="text-2xl">{item.value}</strong>
-                  <span className="text-sm">{item.unit}</span>
-                </li>
-              ))}
+              {results.map((item, i) => {
+                const numericValue =
+                  typeof item.value === "number"
+                    ? item.value
+                    : parseFloat(item.value);
+
+                return (
+                  <li key={i} className="flex items-baseline gap-2">
+                    <span className="text-base">{item.label}:</span>
+                    <strong className="text-3xl flex items-center">
+                      {item.value}
+                      {getStatusIcon(numericValue, item.range)}
+                    </strong>
+                    <span className="text-sm">{item.unit}</span>
+                  </li>
+                );
+              })}
             </ul>
 
             {note && (
               <div className="mt-2 text-xs whitespace-pre-line">{note}</div>
             )}
 
-            {/* 説明文 */}
+            {/* 注意説明 */}
             {helpText && (
               <Disclosure.Panel
                 ref={panelRef}

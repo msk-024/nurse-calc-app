@@ -2,6 +2,8 @@ import Image from "next/image";
 import { HistoryItem } from "@/types/history";
 import { getCalculatorById } from "@/config/calculators";
 import { useRouter } from "next/navigation";
+import { normalRanges } from "@/config/normalRanges";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
 type HistoryListProps = {
   items: HistoryItem[];
@@ -21,19 +23,44 @@ export default function HistoryList({ items }: HistoryListProps) {
         timestamp: item.timestamp,
       })
     );
-    console.log("保存データ", {
-      typeId: item.typeId,
-      sub: item.sub,
-      inputs: item.inputs,
-      timestamp: item.timestamp,
-    });
     router.push(`/${item.typeId}`);
+  };
+
+  // ✅ 基準値判定関数（ResultBoxと同様）
+  const getStatusIcon = (
+    value: number,
+    range?: { min: number; max: number }
+  ) => {
+    if (!range) return null;
+    if (value > range.max)
+      return <ArrowUp className="w-4 h-4 text-red-500 ml-1" />;
+    if (value < range.min)
+      return <ArrowDown className="w-4 h-4 text-blue-500 ml-1" />;
+    return null;
+  };
+
+  // ✅ 計算タイプごとに対応する範囲を決定
+  const getRangeForItem = (item: HistoryItem) => {
+    if (item.typeId === "electrolyte" && item.sub === "na")
+      return normalRanges.sodium;
+    if (item.typeId === "electrolyte" && item.sub === "k")
+      return normalRanges.potassium;
+    if (item.typeId === "bmi") return normalRanges.bmi;
+    return undefined;
   };
 
   return (
     <div className="space-y-2">
       {items.map((item) => {
         const calc = getCalculatorById(item.typeId);
+        const range = getRangeForItem(item);
+
+        // ✅ 結果数値を抽出(型安全含む)
+        const valueMatch = item.resultSummary
+          ? item.resultSummary.match(/([\d.]+)/)
+          : null;
+        const value =
+          valueMatch && valueMatch[1] ? parseFloat(valueMatch[1]) : undefined;
         return (
           <div
             key={item.id}
@@ -61,7 +88,12 @@ export default function HistoryList({ items }: HistoryListProps) {
                         : "電解質補正"
                       : calc?.name ?? "不明な計算"}
                   </p>
-                  <p className="text-sm text-gray-800">{item.resultSummary}</p>
+                  <p className="text-sm text-gray-800 flex items-center">
+                    {item.resultSummary ?? "—"}
+                    {value !== undefined &&
+                      range &&
+                      getStatusIcon(value, range)}
+                  </p>
                 </div>
               </div>
             </div>

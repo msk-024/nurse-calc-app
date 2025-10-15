@@ -22,9 +22,11 @@ export default function HistoryPage() {
   return (
     <>
       <Header title="履歴" />
-      <main className="max-w-6xl mx-auto p-4">
+      <main className="max-w-4xl mt-4 mx-auto px-4 pt-6 pb-16 bg-gray-50 min-h-screen rounded-t-3xl">
         <HistoryTabs active={filter} onChange={setFilter} />
-        <HistoryList items={filtered} />
+        <div className="mt-4">
+          <HistoryList items={filtered} />
+        </div>
       </main>
     </>
   );

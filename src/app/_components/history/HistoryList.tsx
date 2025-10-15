@@ -11,14 +11,14 @@ type HistoryListProps = {
 
 export default function HistoryList({ items }: HistoryListProps) {
   const router = useRouter();
+
   const handleReuse = (item: HistoryItem) => {
-    if (!item.inputs) return; // 念のため
-    // localStorageに保存（型情報はstringで統一）
+    if (!item.inputs) return;
     localStorage.setItem(
       "reusePayload",
       JSON.stringify({
         typeId: item.typeId,
-        sub: item.sub, // Na/K切り替えが必要なもの
+        sub: item.sub,
         inputs: item.inputs,
         timestamp: item.timestamp,
       })
@@ -26,7 +26,6 @@ export default function HistoryList({ items }: HistoryListProps) {
     router.push(`/${item.typeId}`);
   };
 
-  // ✅ 基準値判定関数（ResultBoxと同様）
   const getStatusIcon = (
     value: number,
     range?: { min: number; max: number }
@@ -39,7 +38,6 @@ export default function HistoryList({ items }: HistoryListProps) {
     return null;
   };
 
-  // ✅ 計算タイプごとに対応する範囲を決定
   const getRangeForItem = (item: HistoryItem) => {
     if (item.typeId === "electrolyte" && item.sub === "na")
       return normalRanges.sodium;
@@ -50,34 +48,34 @@ export default function HistoryList({ items }: HistoryListProps) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {items.map((item) => {
         const calc = getCalculatorById(item.typeId);
         const range = getRangeForItem(item);
-
-        // ✅ 結果数値を抽出(型安全含む)
         const valueMatch = item.resultSummary
           ? item.resultSummary.match(/([\d.]+)/)
           : null;
         const value =
           valueMatch && valueMatch[1] ? parseFloat(valueMatch[1]) : undefined;
+
         return (
           <div
             key={item.id}
-            className="flex justify-between items-center gap-2 md:gap-4 p-3 rounded-md bg-white shadow-sm border"
+            className="flex justify-between items-center gap-2 md:gap-4 p-4 rounded-xl bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200"
           >
             <div className="flex items-center gap-4 w-3/4">
               {calc && (
                 <Image
                   src={calc.iconPath}
                   alt={calc.name}
-                  width={24}
-                  height={24}
+                  width={28}
+                  height={28}
                   className="shrink-0"
                 />
               )}
               <div className="flex flex-col">
-                <p className="text-xs text-gray-700">{item.timestamp}</p>
+                <p className="text-xs text-gray-500">{item.timestamp}</p>
+
                 <div className="flex flex-col gap-1 items-start mt-1 md:flex-row md:gap-4 md:items-center md:mt-0">
                   <p className="font-semibold text-sm text-gray-800">
                     {item.typeId === "electrolyte"
@@ -97,10 +95,9 @@ export default function HistoryList({ items }: HistoryListProps) {
                 </div>
               </div>
             </div>
-            {/* 再利用ボタン */}
             <button
               onClick={() => handleReuse(item)}
-              className="w-1/5 text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+              className="w-20 text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 transition-colors duration-200"
             >
               再利用
             </button>

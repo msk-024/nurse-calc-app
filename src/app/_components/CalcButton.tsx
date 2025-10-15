@@ -3,34 +3,41 @@ import { CalculatorType } from "@/types/calculator";
 
 type CalcButtonProps = {
   calc: CalculatorType;
-  active: boolean; // 選択中を保持したいときに使う
+  active: boolean;
   onClick: () => void;
+  compact?: boolean; // ✅ 追加：並べ替えモード用
 };
 
-export default function CalcButton({ calc, active, onClick }: CalcButtonProps) {
+export default function CalcButton({
+  calc,
+  active,
+  onClick,
+  compact = false,
+}: CalcButtonProps) {
   return (
     <button
       onClick={onClick}
       aria-pressed={active}
       className={[
-        // 基本の表示
-        "relative inline-flex items-center gap-2 rounded-lg px-6 py-4 font-semibold text-white tracking-widest",
+        // ✅ compactフラグで幅を切り替える
+        compact ? "w-full h-16" : "w-40 h-16",
+        "relative flex items-center justify-center gap-2 rounded-lg font-semibold text-white tracking-widest",
         "transition-all duration-150 will-change-[box-shadow,filter]",
         calc.color,
+
         !active &&
           [
-            "border border-transparent border-b-2 border-b-black/20", // 下に段差
+            "border border-transparent border-b-2 border-b-black/20",
             "hover:opacity-90",
-            "active:shadow-inner active:shadow-black/30", // 押下中は内側へ
+            "active:shadow-inner active:shadow-black/30",
             "active:border-b-0 active:border-t-2 active:border-t-black/20",
             "active:brightness-95",
           ].join(" "),
 
-        // 押し込まれた状態（アクティブを保持）
         active &&
           [
-            "shadow-inner shadow-black/30", // 常に内側シャドウ
-            "border border-transparent border-t-2 border-t-black/20", // 上に段差を反転
+            "shadow-inner shadow-black/30",
+            "border border-transparent border-t-2 border-t-black/20",
             "brightness-95",
           ].join(" "),
       ].join(" ")}

@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Header from "@/app/_components/Header";
-import CalcNav from "@/app/_components/CalcNav";
+import CalcNav from "@/app/_components/CalcNav/CalcNav";
 import CalculatorContainer from "@/app/_components/CalculatorContainer";
 
 export default function HomePage() {

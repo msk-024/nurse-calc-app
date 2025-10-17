@@ -5,7 +5,7 @@ type CalcButtonProps = {
   calc: CalculatorType;
   active: boolean;
   onClick: () => void;
-  compact?: boolean; // ✅ 追加：並べ替えモード用
+  compact?: boolean;
 };
 
 export default function CalcButton({
@@ -19,8 +19,7 @@ export default function CalcButton({
       onClick={onClick}
       aria-pressed={active}
       className={[
-        // ✅ compactフラグで幅を切り替える
-        compact ? "w-full h-16" : "w-40 h-16",
+        compact ? "w-full h-16" : "w-40 h-16 md:w-full",
         "relative flex items-center justify-center gap-2 rounded-lg font-semibold text-white tracking-widest",
         "transition-all duration-150 will-change-[box-shadow,filter]",
         calc.color,

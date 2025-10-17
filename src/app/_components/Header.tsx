@@ -1,10 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter,usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
-export default function Header({ title = "看護師向け計算ツール" }) {
+type HeaderProps = {
+  title?: string;
+  editMode: boolean;
+  onToggleEdit: () => void;
+};
+
+export default function Header({
+  title = "看護師向け計算ツール",
+  editMode,
+  onToggleEdit,
+}: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [darkMode, setDarkMode] = useState(false);
@@ -18,21 +28,35 @@ export default function Header({ title = "看護師向け計算ツール" }) {
   const toggleDarkMode = () => {
     setDarkMode((prev) => {
       const newMode = !prev;
-      // <html> に dark 付ける/外す
       document.documentElement.classList.toggle("dark", newMode);
       return newMode;
     });
   };
 
   return (
-    <header className="flex justify-between items-center p-4 shadow bg-white dark:bg-gray-800 dark:text-white">
+    <header
+      className={`
+        flex justify-between items-center p-4 shadow relative z-50 transition-colors
+        ${editMode ? "bg-black/5" : "bg-white dark:bg-gray-800"}
+        dark:text-white
+      `}
+    >
       {/* タイトル */}
       <h1 className="font-bold text-lg">{title}</h1>
-
       {/* ボタン群 */}
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
+        {/* 並び替えボタン */}
+        <button onClick={onToggleEdit} aria-label="並び替え">
+          <Image
+            src={getIconPath(editMode ? "check" : "sort")}
+            alt="並び替え"
+            width={22}
+            height={22}
+          />
+        </button>
+
+        {/* 履歴 or ホーム */}
         {pathname === "/history" ? (
-          // 履歴ページなら「ホームへ戻る」
           <button onClick={() => router.push("/")}>
             <Image
               src={getIconPath("home")}
@@ -42,7 +66,6 @@ export default function Header({ title = "看護師向け計算ツール" }) {
             />
           </button>
         ) : (
-          // 通常は「履歴へ」
           <button onClick={() => router.push("/history")}>
             <Image
               src={getIconPath("history")}
@@ -52,6 +75,8 @@ export default function Header({ title = "看護師向け計算ツール" }) {
             />
           </button>
         )}
+
+        {/* ナイトモード切替 */}
         <button onClick={toggleDarkMode}>
           <Image
             src={getIconPath(darkMode ? "dark-moon" : "light-moon")}

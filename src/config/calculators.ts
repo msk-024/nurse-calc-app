@@ -10,7 +10,7 @@ export const calculators: CalculatorType[] = [
   {
     id: "drip",
     name: "点滴速度",
-    iconPath: "/icons/droplet.svg",
+    iconPath: "/icons/fill-drip.svg",
     color: "bg-blue-500",
   },
   {
@@ -28,7 +28,7 @@ export const calculators: CalculatorType[] = [
   {
     id: "bsa",
     name: "体表面積",
-    iconPath: "/icons/stethoscope.svg",
+    iconPath: "/icons/hand-holding-droplet.svg",
     color: "bg-purple-500",
   },
   {
@@ -40,13 +40,13 @@ export const calculators: CalculatorType[] = [
   {
     id: "oxygen",
     name: "酸素投与量",
-    iconPath: "/icons/hospital.svg",
+    iconPath: "/icons/stethoscope.svg",
     color: "bg-teal-500",
   },
   {
     id: "transfusion",
     name: "輸血計算",
-    iconPath: "/icons/syringe.svg",
+    iconPath: "/icons/droplet.svg",
     color: "bg-rose-500",
   },
   {

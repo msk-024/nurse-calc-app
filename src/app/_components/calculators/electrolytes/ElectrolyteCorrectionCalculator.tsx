@@ -2,21 +2,20 @@
 import { useState, useEffect } from "react";
 import NaCorrectionForm from "./NaCorrectionForm";
 import KCorrectionForm from "./KCorrectionForm";
-// import { getReusePayloadOnce } from "@/lib/reuse";
 import { getReusePayload } from "@/lib/reuse/reuse";
 
 export default function ElectrolyteCorrectionCalculator() {
   const [tab, setTab] = useState<"na" | "k">("na");
 
   useEffect(() => {
-    // const reuse = getReusePayloadOnce();
-    const reuse = getReusePayload(); // 取得のみでクリアしない
-    if (
-      reuse?.typeId === "electrolyte" &&
-      (reuse.sub === "na" || reuse.sub === "k")
-    ) {
-      setTab(reuse.sub); // subの値でタブを切り替え
-    }
+      const reuse = getReusePayload();
+      console.log("Hydration後に読み込んだ reusePayload:", reuse);
+      if (
+        reuse?.typeId === "electrolyte" &&
+        (reuse.sub === "na" || reuse.sub === "k")
+      ) {
+        setTab(reuse.sub);
+      }
   }, []);
 
   return (
@@ -43,7 +42,6 @@ export default function ElectrolyteCorrectionCalculator() {
         </button>
       </div>
 
-      {/* タブ表示切替 */}
       {tab === "na" && <NaCorrectionForm />}
       {tab === "k" && <KCorrectionForm />}
     </div>

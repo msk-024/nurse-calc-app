@@ -1,7 +1,8 @@
+"use client";
 import Image from "next/image";
 import { HistoryItem } from "@/types/history";
 import { getCalculatorById } from "@/config/calculators";
-import { useRouter } from "next/navigation";
+import { setReusePayload } from "@/lib/reuse/reuse";
 import { normalRanges } from "@/config/normalRanges";
 import { ArrowUp, ArrowDown } from "lucide-react";
 
@@ -10,20 +11,21 @@ type HistoryListProps = {
 };
 
 export default function HistoryList({ items }: HistoryListProps) {
-  const router = useRouter();
 
-  const handleReuse = (item: HistoryItem) => {
-    if (!item.inputs) return;
-    localStorage.setItem(
-      "reusePayload",
-      JSON.stringify({
-        typeId: item.typeId,
-        sub: item.sub,
-        inputs: item.inputs,
-        timestamp: item.timestamp,
-      })
-    );
-    router.push(`/${item.typeId}`);
+  const handleReuse = (h: HistoryItem) => {
+    console.log("再利用payload保存完了:", h);
+
+    setReusePayload({
+      typeId: h.typeId,
+      sub: h.sub,
+      inputs: h.inputs,
+      timestamp: new Date().toLocaleString("ja-JP"),
+    });
+
+    setTimeout(() => {
+      const url = h.sub ? `/${h.typeId}?sub=${h.sub}` : `/${h.typeId}`;
+      window.location.href = url;
+    }, 100);
   };
 
   const getStatusIcon = (
@@ -66,7 +68,7 @@ export default function HistoryList({ items }: HistoryListProps) {
             <div className="flex items-center gap-4 w-3/4">
               {calc && (
                 <Image
-                  src={calc.iconPath}
+                  src={calc.historyIconPath ?? calc.iconPath}
                   alt={calc.name}
                   width={28}
                   height={28}

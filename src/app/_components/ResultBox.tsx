@@ -89,7 +89,7 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
               {helpText && (
                 <Disclosure.Button aria-label="注意説明">
                   <Image
-                    src="/icons/help-icon.svg"
+                    src="/icons/dark/help-icon.svg"
                     alt="注意"
                     width={28}
                     height={28}

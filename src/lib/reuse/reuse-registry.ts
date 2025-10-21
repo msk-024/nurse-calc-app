@@ -4,7 +4,7 @@ import {
   isMedicationInputs,
   isDripInputs,
   isNutritionInputs,
-  isTransfusionInput,
+  isTransfusionInputs,
   isFluidInputs,
   isOxygenInputs,
   isBmiInputs,
@@ -19,7 +19,7 @@ export const reuseValidators = {
   oxygen: isOxygenInputs,
   bsa: isBsaInputs,
   bmi: isBmiInputs,
-  transfusion: isTransfusionInput,
+  transfusion: isTransfusionInputs,
 } as const;
 
 export type ReusableTypeId = keyof typeof reuseValidators;

@@ -18,16 +18,16 @@ export default function NaCorrectionForm() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
-      "electrolyte",
-      isNaCorrectionInputs,
-      "na"
-    );
-    console.log("Na補正: reusePayload取得", data);
-    if (!data) return;
+      const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
+        "electrolyte",
+        isNaCorrectionInputs,
+        "na"
+      );
+      console.log("Na補正: reusePayload取得", data);
+      if (!data) return;
 
-    setNa(String(data.na));
-    setGlucose(String(data.glucose));
+      setNa(String(data.na));
+      setGlucose(String(data.glucose));
   }, []);
 
   const calculate = () => {

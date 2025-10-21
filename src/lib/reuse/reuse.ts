@@ -81,19 +81,20 @@ export function getTypedReusePayloadOnce<T>(
       "inputs" in parsed
     ) {
       if (isValid(parsed.inputs)) {
-        localStorage.removeItem(STORAGE_KEY);
+        // ✅ 削除を遅延（Hydration完了後に消す）
+        setTimeout(() => localStorage.removeItem(STORAGE_KEY), 500);
         return parsed.inputs as T;
       }
 
-      // フォールバック試す
       if (sub) {
         const fb = fallbackHandlers[sub]?.(parsed.inputs);
         if (fb) {
-          localStorage.removeItem(STORAGE_KEY);
+          setTimeout(() => localStorage.removeItem(STORAGE_KEY), 500);
           return fb as T;
         }
       }
     }
+
     return null;
   } catch {
     return null;

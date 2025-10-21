@@ -1,45 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import Header from "@/app/_components/Header";
-import CalcNav from "@/app/_components/CalcNav/CalcNav";
-import CalculatorContainer from "@/app/_components/CalculatorContainer";
-import OnboardingModal from "@/app/_components/onboarding/OnboardingModal"; 
+import { useHomeState } from "@/app/_components/Home/useHomeState";
+import { onboardingSteps } from "@/app/_components/Home/OnboardingSteps";
+import HomePageLayout from "@/app/_components/Home/HomePageLayout";
+import OnboardingGuide from "@/app/_components/onboarding/OnboardingGuide";
 
 export default function HomePage() {
-  const [activeCalc, setActiveCalc] = useState<string | null>(null);
-
-  // 並び替え状態をここで管理
-  const [editMode, setEditMode] = useState(false);
-
-  // 並び替えトグル関数（HeaderとCalcNav両方に渡す）
-  const toggleEditMode = () => {
-    setEditMode((prev) => !prev);
-  };
+  const { activeCalc, setActiveCalc, editMode, toggleEditMode } =
+    useHomeState();
 
   return (
     <>
-      {/* 初回オンボーディングモーダル */}
-      <OnboardingModal />
-      {/* editMode を Header に渡す */}
-      <Header editMode={editMode} onToggleEdit={toggleEditMode} />
+      {/* 初回オンボーディング */}
+      <OnboardingGuide storageKey="onboarding:home" steps={onboardingSteps} />
 
-      <main className="max-w-6xl mx-auto p-4">
-        {/* editMode を CalcNav にも渡す */}
-        <CalcNav
-          activeCalc={activeCalc}
-          onSelect={setActiveCalc}
-          editMode={editMode}
-          onToggleEdit={toggleEditMode}
-        />
-
-        {/* 選択した計算機能を表示 */}
-        {activeCalc && (
-          <div className="mt-6">
-            <CalculatorContainer activeCalc={activeCalc} />
-          </div>
-        )}
-      </main>
+      {/* メインページ構造 */}
+      <HomePageLayout
+        activeCalc={activeCalc}
+        setActiveCalc={setActiveCalc}
+        editMode={editMode}
+        toggleEditMode={toggleEditMode}
+      />
     </>
   );
 }

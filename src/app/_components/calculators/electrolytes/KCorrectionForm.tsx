@@ -18,16 +18,16 @@ export default function KCorrectionForm() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<KCorrectionInputs>(
-      "electrolyte",
-      isKCorrectionInputs,
-      "k"
-    );
-    console.log("K補正: reusePayload取得", data);
-    if (!data) return;
+      const data = getTypedReusePayloadOnce<KCorrectionInputs>(
+        "electrolyte",
+        isKCorrectionInputs,
+        "k"
+      );
+      console.log("K補正: reusePayload取得", data);
+      if (!data) return;
 
-    setK(String(data.k));
-    setPh(String(data.ph));
+      setK(String(data.k));
+      setPh(String(data.ph));
   }, []);
 
   const calculate = () => {

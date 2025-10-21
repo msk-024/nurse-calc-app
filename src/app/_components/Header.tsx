@@ -6,8 +6,8 @@ import { useState } from "react";
 
 type HeaderProps = {
   title?: string;
-  editMode: boolean;
-  onToggleEdit: () => void;
+  editMode?: boolean;
+  onToggleEdit?: () => void;
 };
 
 export default function Header({
@@ -46,14 +46,16 @@ export default function Header({
       {/* ボタン群 */}
       <div className="flex items-center gap-4">
         {/* 並び替えボタン */}
-        <button onClick={onToggleEdit} aria-label="並び替え">
-          <Image
-            src={getIconPath(editMode ? "check" : "sort")}
-            alt="並び替え"
-            width={22}
-            height={22}
-          />
-        </button>
+        {pathname !== "/history" && (
+          <button onClick={onToggleEdit} aria-label="並び替え">
+            <Image
+              src={getIconPath(editMode ? "check" : "sort")}
+              alt="並び替え"
+              width={22}
+              height={22}
+            />
+          </button>
+        )}
 
         {/* 履歴 or ホーム */}
         {pathname === "/history" ? (

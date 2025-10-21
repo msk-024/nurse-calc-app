@@ -1,3 +1,4 @@
+"use client";
 import { calculators } from "@/config/calculators";
 
 export default function HistoryTabs({

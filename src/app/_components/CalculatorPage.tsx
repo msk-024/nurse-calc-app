@@ -31,11 +31,17 @@ export default function CalculatorPage({ initialSub }: CalculatorPageProps) {
     if (payload) {
       try {
         const parsed = JSON.parse(payload);
-        if (parsed?.typeId) setCurrentCalc(parsed.typeId);
+        if (parsed?.typeId) {
+          setCurrentCalc(parsed.typeId);
+        }
 
-        // 電解質ページ以外のみ削除
+        // ✅ 電解質ページでは削除を遅らせる（Na/Kフォーム側で削除）
+        // ✅ それ以外のページでは削除してOK
         if (parsed?.typeId !== "electrolyte") {
-          localStorage.removeItem("reusePayload");
+          // 100ms遅らせて削除 → ページ遷移直後にgetTypedReusePayloadOnceが実行されるのを保証
+          setTimeout(() => {
+            localStorage.removeItem("reusePayload");
+          }, 100);
         }
       } catch (e) {
         console.error("再利用データの読み込みに失敗:", e);

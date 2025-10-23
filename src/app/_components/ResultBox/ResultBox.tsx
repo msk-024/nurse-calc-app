@@ -3,9 +3,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
-import { ArrowUp, ArrowDown } from "lucide-react";
-import { helpTexts } from "@/config/helpTexts";
+import { helpTexts, type HelpContent } from "@/config/helpTexts";
 import { scrollToRef } from "@/lib/scrollToRef";
+import { ResultList } from "./ResultList";
+import { ResultHelpPanel } from "./ResultHelpPanel";
 
 interface Range {
   min: number;
@@ -57,24 +58,15 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
     yellow: "bg-yellow-50 border-yellow-200 text-yellow-800",
   }[color];
 
-  const helpText = typeId ? helpTexts[typeId] : null;
+  const helpText: HelpContent | undefined = typeId
+    ? helpTexts[typeId]
+    : undefined;
   const panelRef = useRef<HTMLDivElement>(null);
-
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) scrollToRef(panelRef);
   }, [isOpen]);
-
-  // ✅ 基準値チェック関数
-  const getStatusIcon = (value: number, range?: Range) => {
-    if (!range) return null;
-    if (value > range.max)
-      return <ArrowUp className="w-6 h-6 text-red-500 ml-1 inline-block" />;
-    if (value < range.min)
-      return <ArrowDown className="w-6 h-6 text-blue-500 ml-1 inline-block" />;
-    return null;
-  };
 
   return (
     <Disclosure>
@@ -83,11 +75,11 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
 
         return (
           <div className={`border rounded p-4 ${bg}`}>
-            {/* タイトルとアイコン */}
+            {/* タイトルとヘルプアイコン */}
             <div className="flex items-start justify-between">
               <h3 className="font-semibold">{title}</h3>
               {helpText && (
-                <Disclosure.Button aria-label="注意説明">
+                <Disclosure.Button aria-label="使い方と注意">
                   <Image
                     src="/icons/dark/help-icon.svg"
                     alt="注意"
@@ -100,38 +92,15 @@ export const ResultBox: React.FC<ResultBoxProps> = ({
             </div>
 
             {/* 結果リスト */}
-            <ul className="space-y-2">
-              {results.map((item, i) => {
-                const numericValue =
-                  typeof item.value === "number"
-                    ? item.value
-                    : parseFloat(item.value);
-
-                return (
-                  <li key={i} className="flex items-baseline gap-2">
-                    <span className="text-base">{item.label}:</span>
-                    <strong className="text-3xl flex items-center">
-                      {item.value}
-                      {getStatusIcon(numericValue, item.range)}
-                    </strong>
-                    <span className="text-sm">{item.unit}</span>
-                  </li>
-                );
-              })}
-            </ul>
+            <ResultList results={results} />
 
             {note && (
               <div className="mt-2 text-xs whitespace-pre-line">{note}</div>
             )}
 
-            {/* 注意説明 */}
+            {/* 注意事項パネル */}
             {helpText && (
-              <Disclosure.Panel
-                ref={panelRef}
-                className={`mt-2 w-full p-3 ${bg} border-t-0 rounded-t-none text-sm`}
-              >
-                {helpText}
-              </Disclosure.Panel>
+              <ResultHelpPanel ref={panelRef} helpText={helpText} bg={bg} />
             )}
           </div>
         );

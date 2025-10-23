@@ -6,7 +6,7 @@ import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox";
+import { ResultBox } from "../ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isDripInputs } from "@/lib/guards";
@@ -20,7 +20,7 @@ export default function DripCalculator() {
     mlPerHour: string;
     dropsPerMin: string;
   }>(null);
-   const resultRef = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const data = getTypedReusePayloadOnce<DripInputs>("drip", isDripInputs);
@@ -106,14 +106,14 @@ export default function DripCalculator() {
       {/* 結果表示 */}
       {result && (
         <div ref={resultRef}>
-        <ResultBox
-          color="blue"
-          results={[
-            { label: "輸液速度", value: result.mlPerHour, unit: "mL/時" },
-            { label: "滴下数", value: result.dropsPerMin, unit: "滴/分" },
-          ]}
-          typeId="drip"
-        />
+          <ResultBox
+            color="blue"
+            results={[
+              { label: "輸液速度", value: result.mlPerHour, unit: "mL/時" },
+              { label: "滴下数", value: result.dropsPerMin, unit: "滴/分" },
+            ]}
+            typeId="drip"
+          />
         </div>
       )}
     </div>

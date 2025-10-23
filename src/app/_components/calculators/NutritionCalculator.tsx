@@ -8,7 +8,7 @@ import type { PatientCondition } from "@/types/patient";
 import LabeledInput from "../LabeledInput";
 import LabeledSelect from "../LabeledSelect";
 import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox";
+import { ResultBox } from "../ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { patientConditions } from "@/config/patientConditions";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";

@@ -2,7 +2,7 @@
 
 import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
-import { helpTexts } from "@/config/helpTexts";
+import { helpTexts, type HelpContent } from "@/config/helpTexts";
 
 interface HelpBoxProps {
   typeId?: string;
@@ -16,7 +16,7 @@ export const HelpBox: React.FC<HelpBoxProps> = ({
   showPanelBelow,
 }) => {
   if (!typeId) return null;
-  const helpText = helpTexts[typeId];
+  const helpText: HelpContent | undefined = helpTexts[typeId];
   if (!helpText) return null;
 
   return (
@@ -34,12 +34,33 @@ export const HelpBox: React.FC<HelpBoxProps> = ({
             />
           </Disclosure.Button>
 
-          {/* 説明文は ResultBox の下に配置 */}
+          {/* 注意文をResultBoxの下に出す場合 */}
           {showPanelBelow && open && (
             <div
-              className={`mt-2 w-full p-3 ${bg} border-t-0 rounded-t-none shadow-md text-sm`}
+              className={`mt-2 w-full p-3 ${bg} border-t-0 rounded-t-none shadow-md text-sm space-y-2`}
             >
-              {helpText}
+              {/* caution部分 */}
+              <p className="font-semibold">注意事項</p>
+              <p>{helpText.caution}</p>
+
+              {/* tipsがある場合 */}
+              {helpText.tips && (
+                <>
+                  <hr className="my-2 border-gray-300" />
+                  <p className="font-semibold">看護ポイント</p>
+                  <p className="whitespace-pre-line">{helpText.tips}</p>
+                </>
+              )}
+
+              {/* referenceがある場合 */}
+              {helpText.reference && (
+                <>
+                  <hr className="my-2 border-gray-300" />
+                  <p className="text-xs text-gray-500 whitespace-pre-line">
+                    出典：{helpText.reference}
+                  </p>
+                </>
+              )}
             </div>
           )}
         </>

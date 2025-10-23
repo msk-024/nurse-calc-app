@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../LabeledInput";
 import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox";
+import { ResultBox } from "../ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isTransfusionInputs } from "@/lib/guards";

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "../../LabeledInput";
 import SubmitButton from "../../SubmitButton";
-import { ResultBox } from "../../ResultBox";
+import { ResultBox } from "../../ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { isNaCorrectionInputs } from "@/lib/guards";
@@ -18,16 +18,16 @@ export default function NaCorrectionForm() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-      const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
-        "electrolyte",
-        isNaCorrectionInputs,
-        "na"
-      );
-      console.log("Na補正: reusePayload取得", data);
-      if (!data) return;
+    const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
+      "electrolyte",
+      isNaCorrectionInputs,
+      "na"
+    );
+    console.log("Na補正: reusePayload取得", data);
+    if (!data) return;
 
-      setNa(String(data.na));
-      setGlucose(String(data.glucose));
+    setNa(String(data.na));
+    setGlucose(String(data.glucose));
   }, []);
 
   const calculate = () => {

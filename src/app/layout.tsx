@@ -24,11 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-          <head>
-            <link rel="manifest" href="/manifest.json" />
-            <link rel="icon" href="/icons/icon-192.png" />
-            <meta name="theme-color" content="#f87171" />
-            </head>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/icons/icon-192.png" />
+        <meta name="theme-color" content="#f87171" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta
+          name="apple-mobile-web-app-title"
+          content="看護師向け計算ツール"
+        />
+      </head>
       <body
         className={`
           ${geistSans.variable} 

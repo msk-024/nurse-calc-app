@@ -30,10 +30,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#f87171" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta
-          name="apple-mobile-web-app-title"
-          content="看護師向け計算ツール"
-        />
+        <meta name="apple-mobile-web-app-title" content="看護師用計算ツール" />
       </head>
       <body
         className={`

@@ -1,9 +1,7 @@
-"use client";
-
-import { useEffect } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import { SWRegister } from "@/app/sw-register";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,21 +23,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then((registration) => {
-            console.log("Service Worker 登録成功:", registration);
-          })
-          .catch((error) => {
-            console.log("Service Worker 登録失敗:", error);
-          });
-      });
-    }
-  }, []);
-
   return (
     <html lang="ja">
       <head>
@@ -60,6 +43,8 @@ export default function RootLayout({
         `}
       >
         {children}
+        <SWRegister />
+        {/* クライアント側登録を呼び出す */}
       </body>
     </html>
   );

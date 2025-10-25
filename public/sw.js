@@ -502,3 +502,26 @@ define(["./workbox-4754cb34"], function (e) {
       "GET"
     );
 });
+// =============================
+// 💡 Offline fallback for Next.js
+// =============================
+self.addEventListener("fetch", (event) => {
+  // ページ遷移(navigateリクエスト)時のみ処理
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // ネットワークが切れたら、キャッシュ済みルートを返す
+        return caches.match("/").then((response) => {
+          if (response) {
+            return response;
+          } else {
+            // 最後の保険（オフライン時に空レス防止）
+            return new Response("<h1>オフラインです</h1>", {
+              headers: { "Content-Type": "text/html" },
+            });
+          }
+        });
+      })
+    );
+  }
+});

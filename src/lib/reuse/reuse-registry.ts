@@ -1,5 +1,3 @@
-// レジストリ
-
 import {
   isMedicationInputs,
   isDripInputs,

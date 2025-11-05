@@ -1,102 +1,125 @@
-// クライアント専用のユーティリティ（SSR安全）
+// lib/reuse/reuse.ts
+import { z } from "zod";
+import { ReusePayloadSchema, type ReusePayload } from "./schema";
+import { reuseStorage } from "./storage";
+import { ENABLE_DEV_LOGS, REUSE_CLEAR_DELAY_MS, SubType } from "./types";
 import { fallbackHandlers } from "./fallbacks";
 
-const STORAGE_KEY = "reusePayload";
-
-// export type ReusePayload = {
-//   typeId: string;
-//   sub?: "na" | "k"; // 電解質タブ識別用（任意）
-//   inputs?: unknown; // ここは unknown にする（型は各ページの型ガードで絞る）
-//   timestamp?: string;
-// };
-
-export type ReusePayload = {
-  typeId: string;
-  sub?: keyof typeof fallbackHandlers;
-  inputs?: unknown;
-  timestamp?: string;
-};
-
-// 保存
+/** 保存：入力も外枠スキーマで検証後に保存（無効は破棄） */
 export function setReusePayload(payload: ReusePayload): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  } catch {
-    // 端末のプライベートモード等で localStorage 不可な場合の握り潰し
+  const parsed = ReusePayloadSchema.safeParse(payload);
+  if (!parsed.success) {
+    if (ENABLE_DEV_LOGS) {
+      console.warn(
+        "[reuse] setReusePayload: invalid payload",
+        parsed.error.issues
+      );
+    }
+    return;
   }
+  // stringifyは安全
+  reuseStorage.set(JSON.stringify(parsed.data));
 }
 
-// 取得（クリアしない）
+/** 取得（クリアしない） */
 export function getReusePayload(): ReusePayload | null {
-  if (typeof window === "undefined") return null;
+  const raw = reuseStorage.get();
+  if (!raw) return null;
+
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === "object" && "typeId" in parsed) {
-      return parsed as ReusePayload;
+    const json = JSON.parse(raw);
+    const parsed = ReusePayloadSchema.safeParse(json);
+    if (parsed.success) return parsed.data;
+    if (ENABLE_DEV_LOGS) {
+      console.warn(
+        "[reuse] getReusePayload: schema mismatch; dropping",
+        parsed.error.issues
+      );
     }
     return null;
-  } catch {
+  } catch (e) {
+    if (ENABLE_DEV_LOGS)
+      console.warn("[reuse] getReusePayload: JSON.parse failed; dropping", e);
     return null;
   }
 }
 
-// 取得して即クリア（取り回しが楽）
-export function getReusePayloadOnce(): ReusePayload | null {
-  const p = getReusePayload();
-  if (p) clearReusePayload();
-  return p;
-}
-
-// クリア
+/** 即クリア */
 export function clearReusePayload(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {}
+  reuseStorage.remove();
 }
 
-// 履歴再利用
-export function getTypedReusePayloadOnce<T>(
+/** 遅延クリア（Hydration配慮） */
+function clearReusePayloadLater(): void {
+  setTimeout(() => reuseStorage.remove(), REUSE_CLEAR_DELAY_MS);
+}
+
+/**
+ * 型付き再利用取得（Zod）
+ * - 外枠: ReusePayloadSchema で検証
+ * - 内枠: 引数 schema で検証
+ * - 失敗時: subが指定されていればフォールバック変換 → schema再検証
+ * - 取得成功時のみ遅延削除
+ */
+export function getTypedReusePayloadOnce<T extends z.ZodTypeAny>(
   typeId: string,
-  isValid: (v: unknown) => v is T,
-  sub?: keyof typeof fallbackHandlers
-): T | null {
-  if (typeof window === "undefined") return null;
+  schema: T,
+  sub?: SubType
+): z.infer<T> | null {
+  const raw = reuseStorage.get();
+  if (!raw) return null;
+
+  let outer: ReusePayload | null = null;
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-
-    const parsed = JSON.parse(raw);
-    const subOk = parsed.sub ? parsed.sub === sub : true;
-
-    if (
-      parsed &&
-      typeof parsed === "object" &&
-      parsed.typeId === typeId &&
-      subOk &&
-      "inputs" in parsed
-    ) {
-      if (isValid(parsed.inputs)) {
-        // ✅ 削除を遅延（Hydration完了後に消す）
-        setTimeout(() => localStorage.removeItem(STORAGE_KEY), 500);
-        return parsed.inputs as T;
+    const json = JSON.parse(raw);
+    const outerParsed = ReusePayloadSchema.safeParse(json);
+    if (!outerParsed.success) {
+      if (ENABLE_DEV_LOGS) {
+        console.warn(
+          "[reuse] outer schema mismatch; dropping",
+          outerParsed.error.issues
+        );
       }
-
-      if (sub) {
-        const fb = fallbackHandlers[sub]?.(parsed.inputs);
-        if (fb) {
-          setTimeout(() => localStorage.removeItem(STORAGE_KEY), 500);
-          return fb as T;
-        }
-      }
+      return null;
     }
-
-    return null;
-  } catch {
+    outer = outerParsed.data;
+  } catch (e) {
+    if (ENABLE_DEV_LOGS) console.warn("[reuse] JSON.parse failed; dropping", e);
     return null;
   }
+
+  // typeId / sub一致チェック
+  const subOk = outer.sub ? outer.sub === sub : true;
+  if (outer.typeId !== typeId || !subOk) return null;
+
+  // 入力のZod検証
+  const inner = (outer.inputs ?? null) as unknown;
+  const parsed = schema.safeParse(inner);
+  if (parsed.success) {
+    clearReusePayloadLater();
+    return parsed.data;
+  }
+
+  // フォールバック（ある場合）
+  if (sub) {
+    const fb = fallbackHandlers[sub];
+    if (typeof fb === "function") {
+      const converted = fb(inner);
+      const reparsed = schema.safeParse(converted);
+      if (reparsed.success) {
+        if (ENABLE_DEV_LOGS) {
+          console.warn("[reuse] inputs recovered via fallback:", sub);
+        }
+        clearReusePayloadLater();
+        return reparsed.data;
+      }
+    }
+  }
+
+  // ここまで来たら無害化
+  if (ENABLE_DEV_LOGS) {
+    console.warn("[reuse] inputs invalid; returning null");
+  }
+  return null;
 }

@@ -39,8 +39,8 @@ export const calculators: CalculatorType[] = [
   {
     id: "electrolyte",
     name: "電解質補正",
-    iconPath: "/icons/dark/fill-drip.svg",
-    historyIconPath: "/icons/light/fill-drip.svg",
+    iconPath: "/icons/dark/prescription-bottle-medical.svg",
+    historyIconPath: "/icons/light/prescription-bottle-medical.svg",
     color: "bg-cyan-500",
   },
   {

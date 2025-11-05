@@ -1,5 +1,5 @@
-// 今後拡張しやすいように共通のSubType定義
-export type SubType = "na" | "k" | "mg";
+// lib/reuse/fallbacks.ts
+import { SubType } from "./types";
 
 // フォールバック用の共通ハンドラ型
 export type FallbackHandler<T> = (inputs: unknown) => T | null;
@@ -9,18 +9,12 @@ export interface KInputs {
   k: number;
   ph: number;
 }
-
 const kFallback: FallbackHandler<KInputs> = (inputs) => {
   if (typeof inputs !== "object" || inputs === null) return null;
-
   const o = inputs as Partial<Record<keyof KInputs, unknown>>;
-  if ("k" in o && "ph" in o) {
-    const k = Number(o.k);
-    const ph = Number(o.ph);
-    if (!Number.isNaN(k) && !Number.isNaN(ph)) {
-      return { k, ph };
-    }
-  }
+  const k = Number(o.k);
+  const ph = Number(o.ph);
+  if (Number.isFinite(k) && Number.isFinite(ph)) return { k, ph };
   return null;
 };
 
@@ -28,17 +22,11 @@ const kFallback: FallbackHandler<KInputs> = (inputs) => {
 export interface MgInputs {
   mg: number;
 }
-
 const mgFallback: FallbackHandler<MgInputs> = (inputs) => {
   if (typeof inputs !== "object" || inputs === null) return null;
-
   const o = inputs as Partial<Record<keyof MgInputs, unknown>>;
-  if ("mg" in o) {
-    const mg = Number(o.mg);
-    if (!Number.isNaN(mg)) {
-      return { mg };
-    }
-  }
+  const mg = Number(o.mg);
+  if (Number.isFinite(mg)) return { mg };
   return null;
 };
 
@@ -48,5 +36,5 @@ export const fallbackHandlers: Partial<
 > = {
   k: kFallback,
   mg: mgFallback,
-  // naはフォールバック不要なので定義しない
+  // 'na' はフォールバック不要の前提で未定義
 };

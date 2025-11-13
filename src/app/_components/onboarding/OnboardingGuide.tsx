@@ -1,7 +1,7 @@
 // 初回説明（段階的なオンボーディング）
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import GuideHighlight from "./GuideHighlight";
 import GuideOverlay from "./GuideOverlay";
 import GuideContent from "./GuideContent";
@@ -16,8 +16,8 @@ type Step = {
 type Props = {
   storageKey: string;
   steps: Step[];
-  enabled?: boolean; // 強制表示したいときに true
-  onFinish?: () => void; // 終了時コールバック
+  enabled?: boolean;
+  onFinish?: () => void;
 };
 
 export default function OnboardingGuide({
@@ -41,8 +41,8 @@ export default function OnboardingGuide({
     if (!done || enabled) setVisible(true);
   }, [storageKey, enabled]);
 
-  // 対象要素の位置を取得
-  const compute = () => {
+  // ❗ compute を useCallback で固定化
+  const compute = useCallback(() => {
     const s = steps[step];
     if (!s) return setRect(null);
     const el = document.querySelector(s.selector) as HTMLElement | null;
@@ -60,11 +60,11 @@ export default function OnboardingGuide({
       inline: "center",
       behavior: "smooth",
     });
-  };
+  }, [steps, step]);
 
   useLayoutEffect(() => {
     if (visible) compute();
-  }, [step, visible]);
+  }, [visible, compute]);
 
   useEffect(() => {
     if (!visible) return;
@@ -76,21 +76,23 @@ export default function OnboardingGuide({
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll, true);
     };
-  }, [visible, step]);
+  }, [visible, compute]);
 
-  // コントロール関数
-  const finish = () => {
+  // ❗ next / skip / prev / finish を useCallback 化
+  const finish = useCallback(() => {
     setVisible(false);
     localStorage.setItem(storageKey, "done");
     onFinish?.();
-  };
+  }, [storageKey, onFinish]);
 
-  const skip = () => finish();
-  const prev = () => setStep((v) => Math.max(0, v - 1));
-  const next = () => {
+  const skip = useCallback(() => finish(), [finish]);
+
+  const prev = useCallback(() => setStep((v) => Math.max(0, v - 1)), []);
+
+  const next = useCallback(() => {
     if (step === steps.length - 1) finish();
     else setStep((v) => v + 1);
-  };
+  }, [step, steps.length, finish]);
 
   // キーボード対応
   useEffect(() => {
@@ -102,7 +104,7 @@ export default function OnboardingGuide({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [visible, step]);
+  }, [visible, skip, next, prev]);
 
   if (!visible || step >= steps.length) return null;
   const s = steps[step];

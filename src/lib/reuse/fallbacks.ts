@@ -1,4 +1,3 @@
-// lib/reuse/fallbacks.ts
 import { SubType } from "./types";
 
 // フォールバック用の共通ハンドラ型

@@ -64,7 +64,9 @@ export const calculators: CalculatorType[] = [
     historyIconPath: "/icons/light/dumbbell.svg",
     color: "bg-orange-500",
   },
+
   // 追加予定
+
 ];
 
 /** IDから計算カテゴリ情報を取得するヘルパー関数 */

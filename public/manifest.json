@@ -3,8 +3,8 @@
   "short_name": "看護計算",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f87171",
-  "theme_color": "#f87171",
+  "background_color": "#ffba7a",
+  "theme_color": "#ffba7a",
   "description": "看護師が業務で使う投薬・点滴・体液・栄養計算ツールをまとめたアプリです。",
   "icons": [
     {

@@ -1,53 +1,65 @@
+// Na補正計算
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../../LabeledInput";
-import SubmitButton from "../../SubmitButton";
-import { ResultBox } from "../../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isNaCorrectionInputs } from "@/lib/guards";
-import type { NaCorrectionInputs } from "@/types/inputs";
+import { naCorrectionSchema } from "./schema";
 import { normalRanges } from "@/config/normalRanges";
 
 export default function NaCorrectionForm() {
   const [na, setNa] = useState("");
   const [glucose, setGlucose] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用（Zod＋sub="na"）
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<NaCorrectionInputs>(
-      "electrolyte",
-      isNaCorrectionInputs,
-      "na"
+    const data = getTypedReusePayloadOnce(
+      "electrolyte", // typeId
+      naCorrectionSchema, // スキーマ
+      "na" // sub
     );
-    console.log("Na補正: reusePayload取得", data);
+
     if (!data) return;
 
     setNa(String(data.na));
     setGlucose(String(data.glucose));
   }, []);
 
+  // 結果レンダー後にスクロール（setTimeout不要）
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
+
   const calculate = () => {
     const measuredNa = parseFloat(na);
     const glucoseLevel = parseFloat(glucose);
 
-    if (!measuredNa || !glucoseLevel || measuredNa <= 0 || glucoseLevel <= 0) {
+    if (
+      isNaN(measuredNa) ||
+      isNaN(glucoseLevel) ||
+      measuredNa <= 0 ||
+      glucoseLevel <= 0
+    ) {
       alert("正しい数値を入力してください");
       return;
     }
 
+    // Katzの式: 補正Na = 測定Na + 0.016 × (血糖値 - 100)
     const correctedNa = measuredNa + 0.016 * (glucoseLevel - 100);
     const formatted = correctedNa.toFixed(2);
-    setResult(formatted);
 
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
+    setResult(formatted);
 
     const summary = `補正Na ${formatted} mEq/L`;
 
+    // 履歴保存
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",

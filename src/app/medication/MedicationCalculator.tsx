@@ -1,15 +1,16 @@
+// 投薬計算
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../LabeledInput";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isMedicationInputs } from "@/lib/guards";
-import type { MedicationInputs } from "@/types/inputs";
-// import { calculators } from "@/config/calculators";
+// import { MedicationInputsSchema } from "@/lib/calculators/medicationSchema";
+import { medicationSchema } from "./schema";
+
 
 export default function MedicationCalculator() {
   const [weight, setWeight] = useState(""); // 体重 (kg)
@@ -18,19 +19,24 @@ export default function MedicationCalculator() {
   const [result, setResult] = useState<null | {
     totalDose: string;
     volume: string;
-  } | null>(null);
+  }>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用データ(Zod)
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<MedicationInputs>(
-      "medication",
-      isMedicationInputs
-    );
+    const data = getTypedReusePayloadOnce("medication", medicationSchema);
     if (!data) return;
+
     setWeight(String(data.weight));
     setDose(String(data.dose));
     setConcentration(String(data.concentration));
   }, []);
+
+  // 結果がレンダーされた後にスクロール
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
 
   const calculate = () => {
     const w = parseFloat(weight);
@@ -51,9 +57,6 @@ export default function MedicationCalculator() {
     };
 
     setResult(calcResult);
-
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `総投与量 ${calcResult.totalDose}mg・薬液量 ${calcResult.volume}mL`;
 

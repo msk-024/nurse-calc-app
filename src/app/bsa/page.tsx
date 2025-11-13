@@ -3,5 +3,5 @@
 import CalculatorPage from "../_components/CalculatorPage";
 
 export default function BsaPage() {
-  return <CalculatorPage/>;
+  return <CalculatorPage />;
 }

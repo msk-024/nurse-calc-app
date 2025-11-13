@@ -2,39 +2,45 @@
 
 import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../../LabeledInput";
-import SubmitButton from "../../SubmitButton";
-import { ResultBox } from "../../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce, setReusePayload } from "@/lib/reuse/reuse";
-import { isKCorrectionInputs } from "@/lib/guards";
-import type { KCorrectionInputs } from "@/types/inputs";
+import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
+import { kCorrectionSchema } from "./schema";
 import { normalRanges } from "@/config/normalRanges";
 
 export default function KCorrectionForm() {
   const [k, setK] = useState("");
   const [ph, setPh] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<KCorrectionInputs>(
-      "electrolyte",
-      isKCorrectionInputs,
-      "k"
+    const data = getTypedReusePayloadOnce(
+      "electrolyte", // typeId
+      kCorrectionSchema, // Zod内枠
+      "k" // sub
     );
-    console.log("K補正: reusePayload取得", data);
+
     if (!data) return;
 
     setK(String(data.k));
     setPh(String(data.ph));
   }, []);
 
+  // レンダー後即スクロール
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
+
   const calculate = () => {
     const measuredK = parseFloat(k);
     const pH = parseFloat(ph);
 
-    if (!measuredK || !pH || measuredK <= 0 || pH <= 0) {
+    if (isNaN(measuredK) || isNaN(pH) || measuredK <= 0 || pH <= 0) {
       alert("正しい数値を入力してください");
       return;
     }
@@ -42,13 +48,12 @@ export default function KCorrectionForm() {
     // Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)
     const correctedK = measuredK + 0.6 * (7.4 - pH);
     const formatted = correctedK.toFixed(1);
-    setResult(formatted);
 
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
+    setResult(formatted);
 
     const summary = `補正K ${formatted} mEq/L`;
 
+    // 履歴保存
     saveHistory({
       id: Date.now(),
       typeId: "electrolyte",
@@ -58,13 +63,6 @@ export default function KCorrectionForm() {
       result: { correctedK: formatted },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
-    });
-
-    setReusePayload({
-      typeId: "electrolyte",
-      sub: "k",
-      inputs: { k: measuredK, ph: pH },
-      timestamp: new Date().toISOString(),
     });
   };
 
@@ -98,7 +96,7 @@ export default function KCorrectionForm() {
                 label: "補正K",
                 value: result,
                 unit: "mEq/L",
-                range: normalRanges.potassium, // 基準値3.5〜5.0
+                range: normalRanges.potassium,
               },
             ]}
             note="※ Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)"

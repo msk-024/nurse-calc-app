@@ -4,42 +4,46 @@
 import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { oxygenDevices } from "@/config/oxygenDevices";
-import LabeledInput from "../LabeledInput";
-import LabeledSelect from "../LabeledSelect";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import LabeledSelect from "@/app/_components/LabeledSelect";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isOxygenInputs } from "@/lib/guards";
-import type { OxygenInputs } from "@/types/inputs";
+// import { OxygenInputsSchema } from "@/lib/calculators/oxygenSchema";
+import { oxygenSchema } from "./schema";
+
 
 export default function OxygenCalculator() {
   const [deviceId, setDeviceId] = useState("nasal_cannula");
   const [flow, setFlow] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用(Zod)
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<OxygenInputs>(
-      "oxygen",
-      isOxygenInputs
-    );
+    const data = getTypedReusePayloadOnce("oxygen", oxygenSchema);
     if (!data) return;
 
-    const { deviceId, flow } = data;
-
-    setDeviceId(String(deviceId));
-    if (flow != null) setFlow(String(flow)); // flow は任意
+    setDeviceId(String(data.deviceId));
+    if (data.flow != null) setFlow(String(data.flow));
   }, []);
+
+  // 結果レンダー後にスクロール
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
 
   const selectedDevice = oxygenDevices.find((d) => d.id === deviceId);
 
   const calculateFiO2 = () => {
-    const flowRate = parseFloat(flow);
     if (!selectedDevice) {
       alert("デバイスが選択されていません");
       return;
     }
+
+    const flowRate = parseFloat(flow);
 
     let fiO2: number;
 
@@ -54,10 +58,7 @@ export default function OxygenCalculator() {
 
     setResult(fiO2.toFixed(0));
 
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
-
-    // ✅ 履歴に保存
+    // 履歴保存
     saveHistory({
       id: Date.now(),
       typeId: "oxygen",
@@ -83,7 +84,7 @@ export default function OxygenCalculator() {
             label: d.name,
           }))}
         />
-        {/* 室内気は流量入力不要 */}
+
         {deviceId !== "room_air" && (
           <LabeledInput
             label="流量 (L/min)"
@@ -94,13 +95,15 @@ export default function OxygenCalculator() {
           />
         )}
       </div>
+
       <SubmitButton onClick={calculateFiO2} color="bg-teal-500" />
+
       {result && (
         <div ref={resultRef}>
           <ResultBox
             color="teal"
             results={[{ label: "推定 FiO₂", value: result, unit: "%" }]}
-            note={`※ FiO₂の値は代表的な推定値です。\n※ 実際の酸素濃度を保証するものではありません。目安としてご使用ください。\n ※ 患者の呼吸状態やマスクのフィット感により変動します。`}
+            note={`※ FiO₂の値は代表的な推定値です。\n※ 実際の酸素濃度を保証するものではありません。\n※ 患者の呼吸状態やマスクの装着状態で変動します。`}
             typeId="oxygen"
           />
         </div>

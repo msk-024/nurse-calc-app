@@ -2,13 +2,14 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../LabeledInput";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isFluidInputs } from "@/lib/guards";
-import type { FluidInputs } from "@/types/inputs";
+// import { FluidInputsSchema } from "@/lib/calculators/fuildSchema";
+import { fluidSchema } from "./schema";
+
 
 export default function FluidBalanceCalculator() {
   const [prevWeight, setPrevWeight] = useState("");
@@ -25,8 +26,9 @@ export default function FluidBalanceCalculator() {
   }>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 履歴再利用（Zod）
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<FluidInputs>("fluid", isFluidInputs);
+    const data = getTypedReusePayloadOnce("fluid", fluidSchema);
     if (!data) return;
 
     const {
@@ -45,6 +47,13 @@ export default function FluidBalanceCalculator() {
     if (urineOutput != null) setUrineOutput(String(urineOutput));
     if (otherOutput != null) setOtherOutput(String(otherOutput));
   }, []);
+
+  // 結果がレンダーされた後にスクロール
+  useEffect(() => {
+    if (result) {
+      scrollToRef(resultRef);
+    }
+  }, [result]);
 
   const calculate = () => {
     const wPrev = parseFloat(prevWeight);
@@ -77,9 +86,6 @@ export default function FluidBalanceCalculator() {
     };
 
     setResult(calcResult);
-
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `体重${calcResult.weightChange}kg / 水分${calcResult.fluidBalance}mL (${status})`;
 

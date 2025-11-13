@@ -5,36 +5,41 @@ import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
 import { nutritionFactors } from "@/config/nutritionFactors";
 import type { PatientCondition } from "@/types/patient";
-import LabeledInput from "../LabeledInput";
-import LabeledSelect from "../LabeledSelect";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import LabeledSelect from "@/app/_components/LabeledSelect";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { patientConditions } from "@/config/patientConditions";
+// import { NutritionInputsSchema } from "@/lib/calculators/nutritionSchema";
+import { nutritionSchema } from "./schema";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isNutritionInputs } from "@/lib/guards";
-import type { NutritionInputs } from "@/types/inputs";
 
 export default function NutritionCalculator() {
   const [weight, setWeight] = useState("");
   const [condition, setCondition] = useState<PatientCondition>("normal");
+
   const [result, setResult] = useState<null | {
     calorie: string;
     protein: string;
     water: string;
   }>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用データ復元（Zod）
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<NutritionInputs>(
-      "nutrition",
-      isNutritionInputs
-    );
+    const data = getTypedReusePayloadOnce("nutrition", nutritionSchema);
     if (!data) return;
 
     setWeight(String(data.weight));
-    setCondition(data.condition); // 文字列（選択肢）の場合
+    setCondition(data.condition as PatientCondition);
   }, []);
+
+  // 結果レンダー後に確実にスクロール
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
 
   const calculate = () => {
     const w = parseFloat(weight);
@@ -52,9 +57,6 @@ export default function NutritionCalculator() {
     };
 
     setResult(resultData);
-
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
 
     const summary = `エネルギー ${resultData.calorie} kcal / タンパク質 ${resultData.protein} g / 水分量 ${resultData.water} mL`;
 
@@ -104,6 +106,7 @@ export default function NutritionCalculator() {
             note="※ 推定値です。実際の栄養管理は医師・栄養士の指示に従ってください。"
             typeId="nutrition"
           />
+
           {(condition === "burn" || condition === "critical") && (
             <p className="text-sm text-red-600">
               ※ 注意：{condition === "burn" ? "熱傷" : "重症"}患者では

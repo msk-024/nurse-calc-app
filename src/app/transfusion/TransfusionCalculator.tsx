@@ -3,32 +3,40 @@
 
 import { useState, useEffect, useRef } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../LabeledInput";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isTransfusionInputs } from "@/lib/guards";
-import type { TransfusionInputs } from "@/types/inputs";
+// import { TransfusionInputsSchema } from "@/lib/calculators/transfusionSchema";
+import { transfusionSchema } from "./schema";
+// import type { TransfusionInputs } from "@/types/inputs";
 
 export default function TransfusionCalculator() {
   const [weight, setWeight] = useState("");
   const [currentHb, setCurrentHb] = useState("");
   const [targetHb, setTargetHb] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // 再利用復元（Zod）
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<TransfusionInputs>(
+    const data = getTypedReusePayloadOnce(
       "transfusion",
-      isTransfusionInputs
+      transfusionSchema
     );
     if (!data) return;
-    const { weight, currentHb, targetHb } = data;
-    setWeight(String(weight));
-    setCurrentHb(String(currentHb));
-    setTargetHb(String(targetHb));
+
+    setWeight(String(data.weight));
+    setCurrentHb(String(data.currentHb));
+    setTargetHb(String(data.targetHb));
   }, []);
+
+  // 結果レンダー後スクロール
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
 
   const calculate = () => {
     const w = parseFloat(weight);
@@ -47,11 +55,11 @@ export default function TransfusionCalculator() {
       return;
     }
 
+    // RCC必要単位数 = ((目標Hb - 現在Hb) × 体重 × 0.3) / 200
     const units = ((thb - chb) * w * 0.3) / 200;
-    const roundedUnits = Math.ceil(units); // 繰り上げで表示
-    setResult(roundedUnits.toString());
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
+    const roundedUnits = Math.ceil(units);
+
+    setResult(String(roundedUnits));
 
     const summary = `RCC輸血 単位数: ${roundedUnits} 単位`;
 

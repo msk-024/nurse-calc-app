@@ -3,32 +3,39 @@
 
 import { useState, useRef, useEffect } from "react";
 import { saveHistory } from "@/lib/history";
-import LabeledInput from "../LabeledInput";
-import LabeledSelect from "../LabeledSelect";
-import SubmitButton from "../SubmitButton";
-import { ResultBox } from "../ResultBox/ResultBox";
+import LabeledInput from "@/app/_components/LabeledInput";
+import LabeledSelect from "@/app/_components/LabeledSelect";
+import SubmitButton from "@/app/_components/SubmitButton";
+import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-import { isDripInputs } from "@/lib/guards";
-import type { DripInputs } from "@/types/inputs";
+// import { DripInputsSchema } from "@/lib/calculators/dripSchema";
+import { dripSchema } from "./schema";
+
 
 export default function DripCalculator() {
   const [volume, setVolume] = useState("");
   const [hours, setHours] = useState("");
-  const [dropFactor, setDropFactor] = useState("20"); // デフォルト20滴/mL
+  const [dropFactor, setDropFactor] = useState("20");
   const [result, setResult] = useState<null | {
     mlPerHour: string;
     dropsPerMin: string;
   }>(null);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const data = getTypedReusePayloadOnce<DripInputs>("drip", isDripInputs);
+    const data = getTypedReusePayloadOnce("drip", dripSchema);
     if (!data) return;
+
     setVolume(String(data.volume));
     setHours(String(data.hours));
     setDropFactor(String(data.dropFactor));
   }, []);
+
+  useEffect(() => {
+    if (result) scrollToRef(resultRef);
+  }, [result]);
 
   const calculate = () => {
     const v = parseFloat(volume);
@@ -50,9 +57,6 @@ export default function DripCalculator() {
 
     setResult(newResult);
 
-    // スクロール
-    setTimeout(() => scrollToRef(resultRef), 100);
-
     const summary = `輸液速度 ${newResult.mlPerHour} mL/時・滴下数 ${newResult.dropsPerMin}滴/分`;
 
     saveHistory({
@@ -70,7 +74,6 @@ export default function DripCalculator() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold mb-4">点滴速度計算</h2>
 
-      {/* 入力フォーム */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <LabeledInput
           label="総輸液量 (mL)"
@@ -87,6 +90,7 @@ export default function DripCalculator() {
           onChange={(e) => setHours(e.target.value)}
           placeholder="8"
         />
+
         <LabeledSelect
           label="滴下係数"
           value={dropFactor}
@@ -100,10 +104,8 @@ export default function DripCalculator() {
         />
       </div>
 
-      {/* 計算ボタン */}
       <SubmitButton onClick={calculate} color="bg-blue-500" />
 
-      {/* 結果表示 */}
       {result && (
         <div ref={resultRef}>
           <ResultBox

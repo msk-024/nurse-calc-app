@@ -1,14 +1,14 @@
 // ボタン選択後に表示される計算フォーム
 "use client";
-import MedicationCalculator from "./calculators/MedicationCalculator";
-import DripCalculator from "./calculators/DripCalculator";
-import FluidBalanceCalculator from "./calculators/FluidBalanceCalculator";
-import NutritionCalculator from "./calculators/NutritionCalculator";
-import BsaCalculator from "./calculators/BsaCalculator";
-import ElectrolyteCorrectionCalculator from "./calculators/electrolytes/ElectrolyteCorrectionCalculator";
-import OxygenCalculator from "./calculators/OxygenCalculator";
-import TransfusionCalculator from "./calculators/TransfusionCalculator";
-import BMICalculator from "./calculators/BMICalculator";
+import MedicationCalculator from "@/app/medication/MedicationCalculator";
+import DripCalculator from "@/app/drip/DripCalculator";
+import FluidBalanceCalculator from "@/app//fluid/FluidBalanceCalculator";
+import NutritionCalculator from "@/app/nutrition/NutritionCalculator";
+import BsaCalculator from "@/app/bsa/BsaCalculator";
+import ElectrolyteCorrectionCalculator from "@/app/electrolyte/electrolytes/ElectrolyteCorrectionCalculator";
+import OxygenCalculator from "@/app/oxygen/OxygenCalculator";
+import TransfusionCalculator from "@/app/transfusion/TransfusionCalculator";
+import BMICalculator from "@/app/bmi/BMICalculator";
 
 export default function CalculatorContainer({
   activeCalc,

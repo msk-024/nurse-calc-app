@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { CalculatorType } from "@/types/calculator";
+import { useTheme } from "@/app/_context/ThemeContext";
 
 type CalcButtonProps = {
   calc: CalculatorType;
@@ -15,6 +16,13 @@ export default function CalcButton({
   onClick,
   compact = false,
 }: CalcButtonProps) {
+  const { theme } = useTheme();
+
+  const getIconPath = () => {
+    const baseName = calc.iconPath.split("/").pop(); // 例: capsules.svg
+    return `/icons/${theme === "dark" ? "dark" : "light"}/${baseName}`;
+  };
+
   return (
     <button
       onClick={onClick}
@@ -23,6 +31,7 @@ export default function CalcButton({
         compact ? "w-full h-16" : "w-40 h-16 md:w-full",
         "relative flex items-center justify-center gap-2 rounded-lg font-semibold text-white tracking-widest",
         "transition-all duration-150 will-change-[box-shadow,filter]",
+        "select-none touch-none",
         calc.color,
 
         !active &&
@@ -42,7 +51,7 @@ export default function CalcButton({
           ].join(" "),
       ].join(" ")}
     >
-      <Image src={calc.iconPath} alt={calc.name} width={24} height={24} />
+      <Image src={getIconPath()} alt={calc.name} width={24} height={24} />
       {calc.name}
     </button>
   );

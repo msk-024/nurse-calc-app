@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { SWRegister } from "@/app/sw-register";
+import { ThemeProvider } from "./_context/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +43,7 @@ export default function RootLayout({
           dark:bg-gray-900 dark:text-gray-100
         `}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
         <SWRegister />
         {/* クライアント側登録を呼び出す */}
       </body>

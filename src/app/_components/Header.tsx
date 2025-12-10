@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+// import { useState } from "react";
+import { useTheme } from "@/app/_context/ThemeContext";
 
 type HeaderProps = {
   title?: string;
@@ -17,21 +18,23 @@ export default function Header({
 }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [darkMode, setDarkMode] = useState(false);
+  // const [darkMode, setDarkMode] = useState(false);
+
+  const { theme, toggleTheme } = useTheme();
 
   // SVGパスをモードで切り替える関数
   const getIconPath = (name: string) => {
-    return `/icons/${darkMode ? "dark" : "light"}/${name}.svg`;
+    return `/icons/${theme ? "dark" : "light"}/${name}.svg`;
   };
 
   // ダークモード切替
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => {
-      const newMode = !prev;
-      document.documentElement.classList.toggle("dark", newMode);
-      return newMode;
-    });
-  };
+  // const toggleDarkMode = () => {
+  //   setDarkMode((prev) => {
+  //     const newMode = !prev;
+  //     document.documentElement.classList.toggle("dark", newMode);
+  //     return newMode;
+  //   });
+  // };
 
   return (
     <header
@@ -79,9 +82,9 @@ export default function Header({
         )}
 
         {/* ナイトモード切替 */}
-        <button onClick={toggleDarkMode}>
+        <button onClick={toggleTheme}>
           <Image
-            src={getIconPath(darkMode ? "dark-moon" : "light-moon")}
+            src={getIconPath(theme ? "dark-moon" : "light-moon")}
             alt="ナイトモード切替"
             width={24}
             height={24}

@@ -5,12 +5,15 @@ import { getCalculatorById } from "@/config/calculators";
 import { setReusePayload } from "@/lib/reuse/reuse";
 import { normalRanges } from "@/config/normalRanges";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import { useTheme } from "@/app/_context/ThemeContext";
 
 type HistoryListProps = {
   items: HistoryItem[];
 };
 
 export default function HistoryList({ items }: HistoryListProps) {
+
+   const { theme } = useTheme(); 
 
   const handleReuse = (h: HistoryItem) => {
     console.log("再利用payload保存完了:", h);
@@ -49,6 +52,15 @@ export default function HistoryList({ items }: HistoryListProps) {
     return undefined;
   };
 
+  const getHistoryIconPath = (typeId: string) => {
+    const calc = getCalculatorById(typeId);
+    if (!calc) return "/icons/light/unknown.svg";
+    const basePath = calc.historyIconPath ?? calc.iconPath;
+    const baseName = basePath.split("/").pop();
+
+    return `/icons/${theme === "dark" ? "dark" : "light"}/${baseName}`;
+  };
+
   return (
     <div className="space-y-3">
       {items.map((item) => {
@@ -68,7 +80,7 @@ export default function HistoryList({ items }: HistoryListProps) {
             <div className="flex items-center gap-4 w-3/4">
               {calc && (
                 <Image
-                  src={calc.historyIconPath ?? calc.iconPath}
+                  src={getHistoryIconPath(item.typeId)}
                   alt={calc.name}
                   width={28}
                   height={28}

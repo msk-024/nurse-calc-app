@@ -40,9 +40,18 @@ export default function SortableCalcList({
   }));
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    // 長押しで選択ボタンが出てこないように。
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 5,
+      },
+    }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 180, tolerance: 5 },
+      activationConstraint: {
+        delay: 220,
+        tolerance: 6, // 指ブレ許容
+      },
     })
   );
 

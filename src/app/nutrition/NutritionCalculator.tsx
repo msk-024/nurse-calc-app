@@ -2,58 +2,52 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import { nutritionFactors } from "@/config/nutritionFactors";
-import type { PatientCondition } from "@/types/patient";
 import LabeledInput from "@/app/_components/LabeledInput";
 import LabeledSelect from "@/app/_components/LabeledSelect";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { patientConditions } from "@/config/patientConditions";
-// import { NutritionInputsSchema } from "@/lib/calculators/nutritionSchema";
-import { nutritionSchema } from "./schema";
+import { nutritionSchema, type NutritionInputs } from "./schema";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 
 export default function NutritionCalculator() {
-  const [weight, setWeight] = useState("");
-  const [condition, setCondition] = useState<PatientCondition>("normal");
-
   const [result, setResult] = useState<null | {
     calorie: string;
     protein: string;
     water: string;
+    condition: string;
   }>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // 再利用データ復元（Zod）
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<NutritionInputs>({
+    resolver: zodResolver(nutritionSchema),
+    defaultValues: { condition: "normal" },
+  });
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce("nutrition", nutritionSchema);
     if (!data) return;
+    reset(data);
+  }, [reset]);
 
-    setWeight(String(data.weight));
-    setCondition(data.condition as PatientCondition);
-  }, []);
-
-  // 結果レンダー後に確実にスクロール
   useEffect(() => {
     if (result) scrollToRef(resultRef);
   }, [result]);
 
-  const calculate = () => {
-    const w = parseFloat(weight);
-    if (!w || w <= 0) {
-      alert("正しい体重を入力してください");
-      return;
-    }
-
-    const factor = nutritionFactors[condition];
+  const onSubmit = (data: NutritionInputs) => {
+    const factor = nutritionFactors[data.condition as keyof typeof nutritionFactors];
 
     const resultData = {
-      calorie: (w * factor.energy).toFixed(1),
-      protein: (w * factor.protein).toFixed(1),
-      water: (w * factor.water).toFixed(1),
+      calorie: (data.weight * factor.energy).toFixed(1),
+      protein: (data.weight * factor.protein).toFixed(1),
+      water: (data.weight * factor.water).toFixed(1),
+      condition: data.condition,
     };
 
     setResult(resultData);
@@ -64,8 +58,8 @@ export default function NutritionCalculator() {
       id: Date.now(),
       typeId: "nutrition",
       typeName: "栄養計算",
-      inputs: { weight: w, condition },
-      result: resultData,
+      inputs: { weight: data.weight, condition: data.condition },
+      result: { calorie: resultData.calorie, protein: resultData.protein, water: resultData.water },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
     });
@@ -75,24 +69,26 @@ export default function NutritionCalculator() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold mb-4">栄養計算</h2>
 
-      <div className="grid grid-cols-1 gap-4">
-        <LabeledInput
-          label="体重 (kg)"
-          type="number"
-          value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-          placeholder="例: 60"
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 gap-4">
+          <LabeledInput
+            label="体重 (kg)"
+            type="number"
+            placeholder="例: 60"
+            error={errors.weight?.message}
+            {...register("weight")}
+          />
 
-        <LabeledSelect
-          label="患者の状態"
-          value={condition}
-          onChange={(e) => setCondition(e.target.value as PatientCondition)}
-          options={patientConditions}
-        />
-      </div>
+          <LabeledSelect
+            label="患者の状態"
+            options={patientConditions}
+            error={errors.condition?.message}
+            {...register("condition")}
+          />
+        </div>
 
-      <SubmitButton onClick={calculate} color="bg-amber-500" />
+        <SubmitButton color="bg-amber-500" />
+      </form>
 
       {result && (
         <div ref={resultRef}>
@@ -107,9 +103,9 @@ export default function NutritionCalculator() {
             typeId="nutrition"
           />
 
-          {(condition === "burn" || condition === "critical") && (
+          {(result.condition === "burn" || result.condition === "critical") && (
             <p className="text-sm text-red-600">
-              ※ 注意：{condition === "burn" ? "熱傷" : "重症"}患者では
+              ※ 注意：{result.condition === "burn" ? "熱傷" : "重症"}患者では
               状態に応じた調整が必要です。
             </p>
           )}

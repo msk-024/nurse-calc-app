@@ -2,20 +2,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-// import { MedicationInputsSchema } from "@/lib/calculators/medicationSchema";
-import { medicationSchema } from "./schema";
-
+import { medicationSchema, type MedicationInputs } from "./schema";
 
 export default function MedicationCalculator() {
-  const [weight, setWeight] = useState(""); // 体重 (kg)
-  const [dose, setDose] = useState(""); // 投与量 (mg/kg)
-  const [concentration, setConcentration] = useState(""); // 濃度 (mg/mL)
   const [result, setResult] = useState<null | {
     totalDose: string;
     volume: string;
@@ -23,33 +20,23 @@ export default function MedicationCalculator() {
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // 再利用データ(Zod)
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<MedicationInputs>({
+    resolver: zodResolver(medicationSchema),
+  });
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce("medication", medicationSchema);
     if (!data) return;
+    reset(data);
+  }, [reset]);
 
-    setWeight(String(data.weight));
-    setDose(String(data.dose));
-    setConcentration(String(data.concentration));
-  }, []);
-
-  // 結果がレンダーされた後にスクロール
   useEffect(() => {
     if (result) scrollToRef(resultRef);
   }, [result]);
 
-  const calculate = () => {
-    const w = parseFloat(weight);
-    const d = parseFloat(dose);
-    const c = parseFloat(concentration);
-
-    if (!w || !d || !c || w <= 0 || d <= 0 || c <= 0) {
-      alert("正しい値を入力してください");
-      return;
-    }
-
-    const totalDose = w * d;
-    const volume = totalDose / c;
+  const onSubmit = (data: MedicationInputs) => {
+    const totalDose = data.weight * data.dose;
+    const volume = totalDose / data.concentration;
 
     const calcResult = {
       totalDose: totalDose.toFixed(2),
@@ -65,7 +52,7 @@ export default function MedicationCalculator() {
       timestamp: new Date().toLocaleString("ja-JP"),
       typeId: "medication",
       typeName: "投薬計算",
-      inputs: { weight: w, dose: d, concentration: c },
+      inputs: { weight: data.weight, dose: data.dose, concentration: data.concentration },
       result: calcResult,
       resultSummary: summary,
     });
@@ -73,31 +60,33 @@ export default function MedicationCalculator() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4">
-        <LabeledInput
-          label="体重 (kg)"
-          type="number"
-          value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-          placeholder="例: 60"
-        />
-        <LabeledInput
-          label="投与量 (mg/kg)"
-          type="number"
-          value={dose}
-          onChange={(e) => setDose(e.target.value)}
-          placeholder="例: 5"
-        />
-        <LabeledInput
-          label="濃度 (mg/mL)"
-          type="number"
-          value={concentration}
-          onChange={(e) => setConcentration(e.target.value)}
-          placeholder="例: 10"
-        />
-      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
+          <LabeledInput
+            label="体重 (kg)"
+            type="number"
+            placeholder="例: 60"
+            error={errors.weight?.message}
+            {...register("weight")}
+          />
+          <LabeledInput
+            label="投与量 (mg/kg)"
+            type="number"
+            placeholder="例: 5"
+            error={errors.dose?.message}
+            {...register("dose")}
+          />
+          <LabeledInput
+            label="濃度 (mg/mL)"
+            type="number"
+            placeholder="例: 10"
+            error={errors.concentration?.message}
+            {...register("concentration")}
+          />
+        </div>
 
-      <SubmitButton onClick={calculate} color="bg-yellow-500" />
+        <SubmitButton color="bg-yellow-500" />
+      </form>
 
       {result && (
         <div ref={resultRef}>

@@ -5,7 +5,11 @@ const HISTORY_KEY = "nurse-calc-history";
 export function loadHistory(): HistoryItem[] {
   if (typeof window === "undefined") return [];
   const raw = localStorage.getItem(HISTORY_KEY);
-  return raw ? JSON.parse(raw) : [];
+  try {
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveHistory(newItem: HistoryItem) {

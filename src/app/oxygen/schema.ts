@@ -1,8 +1,22 @@
 import { z } from "zod";
 
-export const oxygenSchema = z.object({
-  deviceId: z.string(),
-  flow: z.coerce.number().optional(),
-});
+ export const oxygenSchema = z.object({
+   deviceId: z.enum(
+     [
+       "room_air",
+       "nasal_cannula",
+       "simple_mask",
+       "reservoir_mask",
+       "venturi_mask",
+       "hfnc",
+     ],
+     { errorMap: () => ({ message: "デバイスを選択してください" }) },
+   ),
+   flow: z.coerce
+     .number()
+     .min(0.5, "流量は0.5L/min以上で入力してください")
+     .max(60, "流量は60L/min以下で入力してください")
+     .optional(),
+ });
 
 export type OxygenInputs = z.infer<typeof oxygenSchema>;

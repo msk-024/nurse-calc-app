@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import LabeledSelect from "@/app/_components/LabeledSelect";
@@ -9,14 +11,9 @@ import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-// import { DripInputsSchema } from "@/lib/calculators/dripSchema";
-import { dripSchema } from "./schema";
-
+import { dripSchema, type DripInputs } from "./schema";
 
 export default function DripCalculator() {
-  const [volume, setVolume] = useState("");
-  const [hours, setHours] = useState("");
-  const [dropFactor, setDropFactor] = useState("20");
   const [result, setResult] = useState<null | {
     mlPerHour: string;
     dropsPerMin: string;
@@ -24,31 +21,24 @@ export default function DripCalculator() {
 
   const resultRef = useRef<HTMLDivElement>(null);
 
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<DripInputs>({
+    resolver: zodResolver(dripSchema),
+    defaultValues: { dropFactor: 20 },
+  });
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce("drip", dripSchema);
     if (!data) return;
-
-    setVolume(String(data.volume));
-    setHours(String(data.hours));
-    setDropFactor(String(data.dropFactor));
-  }, []);
+    reset(data);
+  }, [reset]);
 
   useEffect(() => {
     if (result) scrollToRef(resultRef);
   }, [result]);
 
-  const calculate = () => {
-    const v = parseFloat(volume);
-    const h = parseFloat(hours);
-    const df = parseFloat(dropFactor);
-
-    if (isNaN(v) || isNaN(h) || isNaN(df) || v <= 0 || h <= 0 || df <= 0) {
-      alert("正しい数値を入力してください");
-      return;
-    }
-
-    const mlPerHour = v / h;
-    const dropsPerMin = (mlPerHour * df) / 60;
+  const onSubmit = (data: DripInputs) => {
+    const mlPerHour = data.volume / data.hours;
+    const dropsPerMin = (mlPerHour * data.dropFactor) / 60;
 
     const newResult = {
       mlPerHour: mlPerHour.toFixed(1),
@@ -63,7 +53,7 @@ export default function DripCalculator() {
       id: Date.now(),
       typeId: "drip",
       typeName: "点滴速度計算",
-      inputs: { volume: v, hours: h, dropFactor: df },
+      inputs: { volume: data.volume, hours: data.hours, dropFactor: data.dropFactor },
       result: newResult,
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
@@ -74,37 +64,39 @@ export default function DripCalculator() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold mb-4">点滴速度計算</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <LabeledInput
-          label="総輸液量 (mL)"
-          type="number"
-          value={volume}
-          onChange={(e) => setVolume(e.target.value)}
-          placeholder="500"
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <LabeledInput
+            label="総輸液量 (mL)"
+            type="number"
+            placeholder="500"
+            error={errors.volume?.message}
+            {...register("volume")}
+          />
 
-        <LabeledInput
-          label="投与時間 (時間)"
-          type="number"
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-          placeholder="8"
-        />
+          <LabeledInput
+            label="投与時間 (時間)"
+            type="number"
+            placeholder="8"
+            error={errors.hours?.message}
+            {...register("hours")}
+          />
 
-        <LabeledSelect
-          label="滴下係数"
-          value={dropFactor}
-          onChange={(e) => setDropFactor(e.target.value)}
-          options={[
-            { value: "10", label: "10 滴/mL" },
-            { value: "15", label: "15 滴/mL" },
-            { value: "20", label: "20 滴/mL" },
-            { value: "60", label: "60 滴/mL" },
-          ]}
-        />
-      </div>
+          <LabeledSelect
+            label="滴下係数"
+            options={[
+              { value: "10", label: "10 滴/mL" },
+              { value: "15", label: "15 滴/mL" },
+              { value: "20", label: "20 滴/mL" },
+              { value: "60", label: "60 滴/mL" },
+            ]}
+            error={errors.dropFactor?.message}
+            {...register("dropFactor")}
+          />
+        </div>
 
-      <SubmitButton onClick={calculate} color="bg-blue-500" />
+        <SubmitButton color="bg-blue-500" />
+      </form>
 
       {result && (
         <div ref={resultRef}>

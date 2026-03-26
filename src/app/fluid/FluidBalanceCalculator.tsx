@@ -1,23 +1,17 @@
 // 体液計算
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { scrollToRef } from "@/lib/scrollToRef";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
-// import { FluidInputsSchema } from "@/lib/calculators/fuildSchema";
-import { fluidSchema } from "./schema";
-
+import { fluidSchema, type FluidInputs } from "./schema";
 
 export default function FluidBalanceCalculator() {
-  const [prevWeight, setPrevWeight] = useState("");
-  const [currWeight, setCurrWeight] = useState("");
-  const [oralIntake, setOralIntake] = useState("");
-  const [ivIntake, setIvIntake] = useState("");
-  const [urineOutput, setUrineOutput] = useState("");
-  const [otherOutput, setOtherOutput] = useState("");
   const [result, setResult] = useState<null | {
     weightChange: string;
     fluidBalance: string;
@@ -26,49 +20,27 @@ export default function FluidBalanceCalculator() {
   }>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // 履歴再利用（Zod）
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<FluidInputs>({
+    resolver: zodResolver(fluidSchema),
+  });
+
   useEffect(() => {
     const data = getTypedReusePayloadOnce("fluid", fluidSchema);
     if (!data) return;
+    reset(data);
+  }, [reset]);
 
-    const {
-      prevWeight,
-      currWeight,
-      oralIntake,
-      ivIntake,
-      urineOutput,
-      otherOutput,
-    } = data;
-
-    setPrevWeight(String(prevWeight));
-    setCurrWeight(String(currWeight));
-    if (oralIntake != null) setOralIntake(String(oralIntake));
-    if (ivIntake != null) setIvIntake(String(ivIntake));
-    if (urineOutput != null) setUrineOutput(String(urineOutput));
-    if (otherOutput != null) setOtherOutput(String(otherOutput));
-  }, []);
-
-  // 結果がレンダーされた後にスクロール
   useEffect(() => {
-    if (result) {
-      scrollToRef(resultRef);
-    }
+    if (result) scrollToRef(resultRef);
   }, [result]);
 
-  const calculate = () => {
-    const wPrev = parseFloat(prevWeight);
-    const wCurr = parseFloat(currWeight);
-    const oral = parseFloat(oralIntake) || 0;
-    const iv = parseFloat(ivIntake) || 0;
-    const urine = parseFloat(urineOutput) || 0;
-    const other = parseFloat(otherOutput) || 0;
+  const onSubmit = (data: FluidInputs) => {
+    const oral = data.oralIntake ?? 0;
+    const iv = data.ivIntake ?? 0;
+    const urine = data.urineOutput ?? 0;
+    const other = data.otherOutput ?? 0;
 
-    if (!wPrev || !wCurr || wPrev <= 0 || wCurr <= 0) {
-      alert("体重を正しく入力してください");
-      return;
-    }
-
-    const weightChange = wCurr - wPrev;
+    const weightChange = data.currWeight - data.prevWeight;
     const totalIntake = oral + iv;
     const totalOutput = urine + other;
     const fluidBalance = totalIntake - totalOutput;
@@ -95,8 +67,8 @@ export default function FluidBalanceCalculator() {
       typeId: "fluid",
       typeName: "体液バランス計算",
       inputs: {
-        prevWeight: wPrev,
-        currWeight: wCurr,
+        prevWeight: data.prevWeight,
+        currWeight: data.currWeight,
         oralIntake: oral,
         ivIntake: iv,
         urineOutput: urine,
@@ -111,62 +83,63 @@ export default function FluidBalanceCalculator() {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">体液バランス計算</h2>
 
-      {/* 体重 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LabeledInput
-          label="前日体重 (kg)"
-          type="number"
-          value={prevWeight}
-          onChange={(e) => setPrevWeight(e.target.value)}
-          placeholder="例: 60"
-        />
-        <LabeledInput
-          label="当日体重 (kg)"
-          type="number"
-          value={currWeight}
-          onChange={(e) => setCurrWeight(e.target.value)}
-          placeholder="例: 60.5"
-        />
-      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* 体重 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <LabeledInput
+            label="前日体重 (kg)"
+            type="number"
+            placeholder="例: 60"
+            error={errors.prevWeight?.message}
+            {...register("prevWeight")}
+          />
+          <LabeledInput
+            label="当日体重 (kg)"
+            type="number"
+            placeholder="例: 60.5"
+            error={errors.currWeight?.message}
+            {...register("currWeight")}
+          />
+        </div>
 
-      {/* 摂取量 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LabeledInput
-          label="経口摂取 (mL)"
-          type="number"
-          value={oralIntake}
-          onChange={(e) => setOralIntake(e.target.value)}
-          placeholder="例: 1200"
-        />
-        <LabeledInput
-          label="輸液量 (mL)"
-          type="number"
-          value={ivIntake}
-          onChange={(e) => setIvIntake(e.target.value)}
-          placeholder="例: 500"
-        />
-      </div>
+        {/* 摂取量 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <LabeledInput
+            label="経口摂取 (mL)"
+            type="number"
+            placeholder="例: 1200"
+            error={errors.oralIntake?.message}
+            {...register("oralIntake")}
+          />
+          <LabeledInput
+            label="輸液量 (mL)"
+            type="number"
+            placeholder="例: 500"
+            error={errors.ivIntake?.message}
+            {...register("ivIntake")}
+          />
+        </div>
 
-      {/* 排出量 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LabeledInput
-          label="尿量 (mL)"
-          type="number"
-          value={urineOutput}
-          onChange={(e) => setUrineOutput(e.target.value)}
-          placeholder="例: 1000"
-        />
-        <LabeledInput
-          label="その他排泄 (mL)"
-          type="number"
-          value={otherOutput}
-          onChange={(e) => setOtherOutput(e.target.value)}
-          placeholder="例: 200"
-        />
-      </div>
+        {/* 排出量 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <LabeledInput
+            label="尿量 (mL)"
+            type="number"
+            placeholder="例: 1000"
+            error={errors.urineOutput?.message}
+            {...register("urineOutput")}
+          />
+          <LabeledInput
+            label="その他排泄 (mL)"
+            type="number"
+            placeholder="例: 200"
+            error={errors.otherOutput?.message}
+            {...register("otherOutput")}
+          />
+        </div>
 
-      {/* 計算ボタン */}
-      <SubmitButton onClick={calculate} color="bg-green-500" />
+        <SubmitButton color="bg-green-500" />
+      </form>
 
       {result && (
         <div ref={resultRef}>
@@ -175,11 +148,7 @@ export default function FluidBalanceCalculator() {
             results={[
               { label: "体重変化", value: result.weightChange, unit: "kg" },
               { label: "水分バランス", value: result.fluidBalance, unit: "mL" },
-              {
-                label: "推定体液変動",
-                value: result.estimatedFluid,
-                unit: "mL",
-              },
+              { label: "推定体液変動", value: result.estimatedFluid, unit: "mL" },
               { label: "評価", value: result.status, unit: "" },
             ]}
             typeId="fluid"

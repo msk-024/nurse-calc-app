@@ -1,38 +1,15 @@
 // 体液計算
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { fluidSchema, type FluidInputs } from "./schema";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function FluidBalanceCalculator() {
-  const [result, setResult] = useState<null | {
-    weightChange: string;
-    fluidBalance: string;
-    estimatedFluid: string;
-    status: string;
-  }>(null);
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FluidInputs>({
-    resolver: zodResolver(fluidSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("fluid", fluidSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<FluidInputs>(fluidSchema, "fluid");
 
   const onSubmit = (data: FluidInputs) => {
     const oral = data.oralIntake ?? 0;
@@ -148,7 +125,11 @@ export default function FluidBalanceCalculator() {
             results={[
               { label: "体重変化", value: result.weightChange, unit: "kg" },
               { label: "水分バランス", value: result.fluidBalance, unit: "mL" },
-              { label: "推定体液変動", value: result.estimatedFluid, unit: "mL" },
+              {
+                label: "推定体液変動",
+                value: result.estimatedFluid,
+                unit: "mL",
+              },
               { label: "評価", value: result.status, unit: "" },
             ]}
             typeId="fluid"

@@ -1,17 +1,18 @@
 // 点滴計算
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import LabeledSelect from "@/app/_components/LabeledSelect";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { dripSchema, type DripInputs } from "./schema";
+import { useCalculator } from "@/hooks/useCalculator";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useEffect, useState } from "react";
+import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
+import { scrollToRef } from "@/lib/scrollToRef";
 
 export default function DripCalculator() {
   const [result, setResult] = useState<null | {
@@ -21,7 +22,12 @@ export default function DripCalculator() {
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<DripInputs>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<DripInputs>({
     resolver: zodResolver(dripSchema),
     defaultValues: { dropFactor: 20 },
   });
@@ -53,7 +59,11 @@ export default function DripCalculator() {
       id: Date.now(),
       typeId: "drip",
       typeName: "点滴速度計算",
-      inputs: { volume: data.volume, hours: data.hours, dropFactor: data.dropFactor },
+      inputs: {
+        volume: data.volume,
+        hours: data.hours,
+        dropFactor: data.dropFactor,
+      },
       result: newResult,
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

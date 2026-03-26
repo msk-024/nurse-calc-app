@@ -1,47 +1,23 @@
 // 栄養計算
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import { nutritionFactors } from "@/config/nutritionFactors";
 import LabeledInput from "@/app/_components/LabeledInput";
 import LabeledSelect from "@/app/_components/LabeledSelect";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
 import { patientConditions } from "@/config/patientConditions";
 import { nutritionSchema, type NutritionInputs } from "./schema";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function NutritionCalculator() {
-  const [result, setResult] = useState<null | {
-    calorie: string;
-    protein: string;
-    water: string;
-    condition: string;
-  }>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<NutritionInputs>({
-    resolver: zodResolver(nutritionSchema),
-    defaultValues: { condition: "normal" },
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("nutrition", nutritionSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<NutritionInputs>(nutritionSchema, "nutrition");
 
   const onSubmit = (data: NutritionInputs) => {
-    const factor = nutritionFactors[data.condition as keyof typeof nutritionFactors];
+    const factor =
+      nutritionFactors[data.condition as keyof typeof nutritionFactors];
 
     const resultData = {
       calorie: (data.weight * factor.energy).toFixed(1),
@@ -59,7 +35,11 @@ export default function NutritionCalculator() {
       typeId: "nutrition",
       typeName: "栄養計算",
       inputs: { weight: data.weight, condition: data.condition },
-      result: { calorie: resultData.calorie, protein: resultData.protein, water: resultData.water },
+      result: {
+        calorie: resultData.calorie,
+        protein: resultData.protein,
+        water: resultData.water,
+      },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),
     });

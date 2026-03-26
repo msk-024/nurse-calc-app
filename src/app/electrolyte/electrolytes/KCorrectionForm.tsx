@@ -1,35 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { kCorrectionSchema, type KCorrectionInputs } from "./schema";
 import { normalRanges } from "@/config/normalRanges";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function KCorrectionForm() {
-  const [result, setResult] = useState<string | null>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<KCorrectionInputs>({
-    resolver: zodResolver(kCorrectionSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("electrolyte", kCorrectionSchema, "k");
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<KCorrectionInputs>(kCorrectionSchema, "electrolyte", "k");
 
   const onSubmit = (data: KCorrectionInputs) => {
     // Katzの式：補正K = 実測K + 0.6 × (7.4 - pH)

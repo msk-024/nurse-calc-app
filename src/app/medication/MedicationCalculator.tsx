@@ -1,38 +1,16 @@
 // 投薬計算
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { medicationSchema, type MedicationInputs } from "./schema";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function MedicationCalculator() {
-  const [result, setResult] = useState<null | {
-    totalDose: string;
-    volume: string;
-  }>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<MedicationInputs>({
-    resolver: zodResolver(medicationSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("medication", medicationSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<MedicationInputs>(medicationSchema, "medication");
 
   const onSubmit = (data: MedicationInputs) => {
     const totalDose = data.weight * data.dose;
@@ -52,7 +30,11 @@ export default function MedicationCalculator() {
       timestamp: new Date().toLocaleString("ja-JP"),
       typeId: "medication",
       typeName: "投薬計算",
-      inputs: { weight: data.weight, dose: data.dose, concentration: data.concentration },
+      inputs: {
+        weight: data.weight,
+        dose: data.dose,
+        concentration: data.concentration,
+      },
       result: calcResult,
       resultSummary: summary,
     });

@@ -1,34 +1,16 @@
 // 体表面積
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
 import { bsaSchema, type BsaInputs } from "./schema";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function BsaCalculator() {
-  const [result, setResult] = useState<string | null>(null);
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<BsaInputs>({
-    resolver: zodResolver(bsaSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("bsa", bsaSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<BsaInputs>(bsaSchema, "bsa");
 
   const onSubmit = (data: BsaInputs) => {
     // Mosteller式: BSA = √[(身長(cm) × 体重(kg)) / 3600]

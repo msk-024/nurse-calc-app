@@ -1,36 +1,17 @@
 // Na補正計算
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { naCorrectionSchema, type NaCorrectionInputs } from "./schema";
 import { normalRanges } from "@/config/normalRanges";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function NaCorrectionForm() {
-  const [result, setResult] = useState<string | null>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<NaCorrectionInputs>({
-    resolver: zodResolver(naCorrectionSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("electrolyte", naCorrectionSchema, "na");
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<NaCorrectionInputs>(naCorrectionSchema, "electrolyte", "na");
 
   const onSubmit = (data: NaCorrectionInputs) => {
     // Katzの式: 補正Na = 測定Na + 0.016 × (血糖値 - 100)

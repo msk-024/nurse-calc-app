@@ -1,41 +1,27 @@
 // 酸素投与量計算
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import { oxygenDevices } from "@/config/oxygenDevices";
 import LabeledInput from "@/app/_components/LabeledInput";
 import LabeledSelect from "@/app/_components/LabeledSelect";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { oxygenSchema, type OxygenInputs } from "./schema";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function OxygenCalculator() {
-  const [result, setResult] = useState<string | null>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<OxygenInputs>({
-    resolver: zodResolver(oxygenSchema),
-    defaultValues: { deviceId: "nasal_cannula" },
-    shouldUnregister: true,
-  });
+  const {
+    result,
+    setResult,
+    resultRef,
+    register,
+    handleSubmit,
+    watch,
+    errors,
+  } = useCalculator<OxygenInputs>(oxygenSchema, "oxygen");
 
   const deviceId = watch("deviceId");
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("oxygen", oxygenSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
 
   const onSubmit = (data: OxygenInputs) => {
     const selectedDevice = oxygenDevices.find((d) => d.id === data.deviceId);

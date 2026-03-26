@@ -1,35 +1,17 @@
 // BMI計算
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
 import { bmiSchema, type BmiInputs } from "./schema";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { normalRanges } from "@/config/normalRanges";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function BMICalculator() {
-  const [result, setResult] = useState<string | null>(null);
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<BmiInputs>({
-    resolver: zodResolver(bmiSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("bmi", bmiSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const { result, setResult, resultRef, register, handleSubmit, errors } =
+    useCalculator<BmiInputs>(bmiSchema, "bmi");
 
   const onSubmit = (data: BmiInputs) => {
     const bmi = data.weight / (data.height / 100) ** 2;

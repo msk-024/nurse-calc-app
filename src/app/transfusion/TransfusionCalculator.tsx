@@ -1,39 +1,29 @@
 // 輸血計算
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { saveHistory } from "@/lib/history";
 import LabeledInput from "@/app/_components/LabeledInput";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
-import { scrollToRef } from "@/lib/scrollToRef";
-import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { transfusionSchema, type TransfusionInputs } from "./schema";
+import { useCalculator } from "@/hooks/useCalculator";
 
 export default function TransfusionCalculator() {
-  const [result, setResult] = useState<string | null>(null);
-
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  const { register, handleSubmit, reset, setError, formState: { errors } } = useForm<TransfusionInputs>({
-    resolver: zodResolver(transfusionSchema),
-  });
-
-  useEffect(() => {
-    const data = getTypedReusePayloadOnce("transfusion", transfusionSchema);
-    if (!data) return;
-    reset(data);
-  }, [reset]);
-
-  useEffect(() => {
-    if (result) scrollToRef(resultRef);
-  }, [result]);
+  const {
+    result,
+    setResult,
+    resultRef,
+    register,
+    handleSubmit,
+    setError,
+    errors,
+  } = useCalculator<TransfusionInputs>(transfusionSchema, "transfusion");
 
   const onSubmit = (data: TransfusionInputs) => {
     if (data.targetHb <= data.currentHb) {
-      setError("targetHb", { message: "目標Hbは現在Hbより高く入力してください" });
+      setError("targetHb", {
+        message: "目標Hbは現在Hbより高く入力してください",
+      });
       return;
     }
 
@@ -49,7 +39,11 @@ export default function TransfusionCalculator() {
       id: Date.now(),
       typeId: "transfusion",
       typeName: "輸血量計算",
-      inputs: { weight: data.weight, currentHb: data.currentHb, targetHb: data.targetHb },
+      inputs: {
+        weight: data.weight,
+        currentHb: data.currentHb,
+        targetHb: data.targetHb,
+      },
       result: { units: roundedUnits },
       resultSummary: summary,
       timestamp: new Date().toLocaleString("ja-JP"),

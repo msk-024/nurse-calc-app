@@ -12,7 +12,7 @@ type SubType = "na" | "k" | "mg";
 interface UseCalculatorReturn<TInputs extends Record<string, any>> {
   result: any;
   setResult: (result: any) => void;
-  resultRef: React.RefObject<HTMLDivElement>;
+  resultRef: React.RefObject<HTMLDivElement | null>;
   register: UseFormReturn<TInputs>["register"];
   handleSubmit: UseFormReturn<TInputs>["handleSubmit"];
   reset: UseFormReturn<TInputs>["reset"];
@@ -45,7 +45,7 @@ export function useCalculator<TInputs extends Record<string, any>>(
 
   const form = useForm<TInputs>({
     resolver: zodResolver(schema),
-    defaultValues: {} as TInputs,
+    defaultValues: undefined,
     shouldUnregister: false, // OxygenCalculator の条件付きフィールド対応
   });
 

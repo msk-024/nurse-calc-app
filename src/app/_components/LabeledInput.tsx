@@ -22,7 +22,7 @@ const LabeledInput = React.forwardRef<HTMLInputElement, LabeledInputProps>(
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full border rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 ${
+          className={`w-full border rounded-lg px-4 py-3 text-lg text-gray-900 bg-white focus:outline-none focus:ring-2 ${
             error ? "border-red-500 focus:ring-red-400" : "focus:ring-blue-400"
           }`}
         />

@@ -5,16 +5,11 @@ import { getCalculatorById } from "@/config/calculators";
 import { setReusePayload } from "@/lib/reuse/reuse";
 import { normalRanges } from "@/config/normalRanges";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { useTheme } from "@/app/_context/ThemeContext";
-
 type HistoryListProps = {
   items: HistoryItem[];
 };
 
 export default function HistoryList({ items }: HistoryListProps) {
-
-   const { theme } = useTheme(); 
-
   const handleReuse = (h: HistoryItem) => {
     console.log("再利用payload保存完了:", h);
 

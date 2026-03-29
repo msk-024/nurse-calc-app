@@ -53,7 +53,8 @@ export default function HistoryList({ items }: HistoryListProps) {
     const basePath = calc.historyIconPath ?? calc.iconPath;
     const baseName = basePath.split("/").pop();
 
-    return `/icons/${theme === "dark" ? "dark" : "light"}/${baseName}`;
+    // 履歴カードは bg-white 固定のため、ナイトモードでも常に light アイコンを使う
+    return `/icons/light/${baseName}`;
   };
 
   return (

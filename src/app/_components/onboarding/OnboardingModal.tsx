@@ -10,10 +10,15 @@ export default function OnboardingModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem("onboardingSeen");
-    if (!seen) {
-      setIsOpen(true);
-      localStorage.setItem("onboardingSeen", "true");
+    if (typeof window === "undefined") return;
+    try {
+      const seen = localStorage.getItem("onboardingSeen");
+      if (!seen) {
+        setIsOpen(true);
+        localStorage.setItem("onboardingSeen", "true");
+      }
+    } catch (e) {
+      console.warn("Failed to check onboarding state:", e);
     }
   }, []);
 

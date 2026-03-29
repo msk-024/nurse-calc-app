@@ -15,18 +15,10 @@ export default function TransfusionCalculator() {
     resultRef,
     register,
     handleSubmit,
-    setError,
     errors,
   } = useCalculator<TransfusionInputs>(transfusionSchema, "transfusion");
 
   const onSubmit = (data: TransfusionInputs) => {
-    if (data.targetHb <= data.currentHb) {
-      setError("targetHb", {
-        message: "目標Hbは現在Hbより高く入力してください",
-      });
-      return;
-    }
-
     // RCC必要単位数 = ((目標Hb - 現在Hb) × 体重 × 0.3) / 200
     const units = ((data.targetHb - data.currentHb) * data.weight * 0.3) / 200;
     const roundedUnits = Math.ceil(units);

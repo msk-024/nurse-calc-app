@@ -37,8 +37,14 @@ export default function OnboardingGuide({
 
   // 初回のみ表示
   useEffect(() => {
-    const done = localStorage.getItem(storageKey) === "done";
-    if (!done || enabled) setVisible(true);
+    if (typeof window === "undefined") return;
+    try {
+      const done = localStorage.getItem(storageKey) === "done";
+      if (!done || enabled) setVisible(true);
+    } catch (e) {
+      console.warn("Failed to load onboarding state:", e);
+      if (enabled) setVisible(true);
+    }
   }, [storageKey, enabled]);
 
   // ❗ compute を useCallback で固定化

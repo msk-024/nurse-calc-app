@@ -10,10 +10,7 @@ export function setReusePayload(payload: ReusePayload): void {
   const parsed = ReusePayloadSchema.safeParse(payload);
   if (!parsed.success) {
     if (ENABLE_DEV_LOGS) {
-      console.warn(
-        "[reuse] setReusePayload: invalid payload",
-        parsed.error.issues
-      );
+      console.warn("[reuse] setReusePayload: invalid payload", parsed.error.issues);
     }
     return;
   }
@@ -31,15 +28,11 @@ export function getReusePayload(): ReusePayload | null {
     const parsed = ReusePayloadSchema.safeParse(json);
     if (parsed.success) return parsed.data;
     if (ENABLE_DEV_LOGS) {
-      console.warn(
-        "[reuse] getReusePayload: schema mismatch; dropping",
-        parsed.error.issues
-      );
+      console.warn("[reuse] getReusePayload: schema mismatch; dropping", parsed.error.issues);
     }
     return null;
   } catch (e) {
-    if (ENABLE_DEV_LOGS)
-      console.warn("[reuse] getReusePayload: JSON.parse failed; dropping", e);
+    if (ENABLE_DEV_LOGS) console.warn("[reuse] getReusePayload: JSON.parse failed; dropping", e);
     return null;
   }
 }
@@ -52,6 +45,69 @@ export function clearReusePayload(): void {
 /** 遅延クリア（Hydration配慮） */
 function clearReusePayloadLater(): void {
   setTimeout(() => reuseStorage.remove(), REUSE_CLEAR_DELAY_MS);
+}
+
+/**
+ * 外枠スキーマの検証とJSON解析
+ * @returns 検証済みの外枠ペイロード、失敗時はnull
+ */
+function _validateOuter(raw: string): ReusePayload | null {
+  try {
+    const json = JSON.parse(raw);
+    const outerParsed = ReusePayloadSchema.safeParse(json);
+    if (!outerParsed.success) {
+      if (ENABLE_DEV_LOGS) {
+        console.warn("[reuse] outer schema mismatch; dropping", outerParsed.error.issues);
+      }
+      return null;
+    }
+    return outerParsed.data;
+  } catch (e) {
+    if (ENABLE_DEV_LOGS) console.warn("[reuse] JSON.parse failed; dropping", e);
+    return null;
+  }
+}
+
+/**
+ * typeId / sub の一致確認
+ */
+function _matchesTypeAndSub(outer: ReusePayload, typeId: string, sub?: SubType): boolean {
+  const subOk = outer.sub ? outer.sub === sub : true;
+  return outer.typeId === typeId && subOk;
+}
+
+/**
+ * 内枠スキーマの検証とフォールバック処理
+ */
+function _validateAndFallback<T extends z.ZodTypeAny>(
+  inputs: unknown,
+  schema: T,
+  sub?: SubType
+): z.infer<T> | null {
+  const parsed = schema.safeParse(inputs);
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  // フォールバック（ある場合）
+  if (sub) {
+    const fb = fallbackHandlers[sub];
+    if (typeof fb === "function") {
+      const converted = fb(inputs);
+      const reparsed = schema.safeParse(converted);
+      if (reparsed.success) {
+        if (ENABLE_DEV_LOGS) {
+          console.warn("[reuse] inputs recovered via fallback:", sub);
+        }
+        return reparsed.data;
+      }
+    }
+  }
+
+  if (ENABLE_DEV_LOGS) {
+    console.warn("[reuse] inputs invalid; returning null");
+  }
+  return null;
 }
 
 /**
@@ -69,57 +125,17 @@ export function getTypedReusePayloadOnce<T extends z.ZodTypeAny>(
   const raw = reuseStorage.get();
   if (!raw) return null;
 
-  let outer: ReusePayload | null = null;
+  const outer = _validateOuter(raw);
+  if (!outer) return null;
 
-  try {
-    const json = JSON.parse(raw);
-    const outerParsed = ReusePayloadSchema.safeParse(json);
-    if (!outerParsed.success) {
-      if (ENABLE_DEV_LOGS) {
-        console.warn(
-          "[reuse] outer schema mismatch; dropping",
-          outerParsed.error.issues
-        );
-      }
-      return null;
-    }
-    outer = outerParsed.data;
-  } catch (e) {
-    if (ENABLE_DEV_LOGS) console.warn("[reuse] JSON.parse failed; dropping", e);
-    return null;
-  }
+  if (!_matchesTypeAndSub(outer, typeId, sub)) return null;
 
-  // typeId / sub一致チェック
-  const subOk = outer.sub ? outer.sub === sub : true;
-  if (outer.typeId !== typeId || !subOk) return null;
+  const inputs = (outer.inputs ?? null) as unknown;
+  const result = _validateAndFallback(inputs, schema, sub);
 
-  // 入力のZod検証
-  const inner = (outer.inputs ?? null) as unknown;
-  const parsed = schema.safeParse(inner);
-  if (parsed.success) {
+  if (result) {
     clearReusePayloadLater();
-    return parsed.data;
   }
 
-  // フォールバック（ある場合）
-  if (sub) {
-    const fb = fallbackHandlers[sub];
-    if (typeof fb === "function") {
-      const converted = fb(inner);
-      const reparsed = schema.safeParse(converted);
-      if (reparsed.success) {
-        if (ENABLE_DEV_LOGS) {
-          console.warn("[reuse] inputs recovered via fallback:", sub);
-        }
-        clearReusePayloadLater();
-        return reparsed.data;
-      }
-    }
-  }
-
-  // ここまで来たら無害化
-  if (ENABLE_DEV_LOGS) {
-    console.warn("[reuse] inputs invalid; returning null");
-  }
-  return null;
+  return result;
 }

@@ -9,9 +9,9 @@ import { scrollToRef } from "@/lib/scrollToRef";
 
 type SubType = "na" | "k" | "mg";
 
-interface UseCalculatorReturn<TInputs extends Record<string, any>> {
-  result: any;
-  setResult: (result: any) => void;
+interface UseCalculatorReturn<TInputs extends Record<string, any>, TResult = any> {
+  result: TResult | null;
+  setResult: (result: TResult) => void;
   resultRef: React.RefObject<HTMLDivElement | null>;
   register: UseFormReturn<TInputs>["register"];
   handleSubmit: UseFormReturn<TInputs>["handleSubmit"];
@@ -35,12 +35,15 @@ interface UseCalculatorReturn<TInputs extends Record<string, any>> {
  * @param sub - 電解質計算用サブタイプ（"na" | "k"）
  * @returns useForm が返すメソッドと result 管理 state
  */
-export function useCalculator<TInputs extends Record<string, any>>(
+export function useCalculator<
+  TInputs extends Record<string, any>,
+  TResult = any
+>(
   schema: ZodTypeAny,
   typeId: string,
   sub?: SubType,
-): UseCalculatorReturn<TInputs> {
-  const [result, setResult] = useState<any>(null);
+): UseCalculatorReturn<TInputs, TResult> {
+  const [result, setResult] = useState<TResult | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<TInputs>({

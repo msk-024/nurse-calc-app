@@ -8,7 +8,6 @@ import {
   useLayoutEffect,
 } from "react";
 
-
 type Theme = "light" | "dark";
 
 type ThemeContextType = {
@@ -26,17 +25,27 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 初回ロードでlocalStorageから復元
   useLayoutEffect(() => {
-    const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored) {
-      setTheme(stored);
-      document.documentElement.classList.toggle("dark", stored === "dark");
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem("theme") as Theme | null;
+      if (stored) {
+        setTheme(stored);
+        document.documentElement.classList.toggle("dark", stored === "dark");
+      }
+    } catch (e) {
+      console.warn("Failed to load theme from localStorage:", e);
     }
   }, []);
 
   // 切り替え時のDOM反映＋localStorage保存
   useLayoutEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
+    if (typeof window === "undefined") return;
+    try {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      localStorage.setItem("theme", theme);
+    } catch (e) {
+      console.warn("Failed to save theme to localStorage:", e);
+    }
   }, [theme]);
 
   const toggleTheme = () =>

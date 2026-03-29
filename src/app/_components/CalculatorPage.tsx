@@ -27,9 +27,10 @@ export default function CalculatorPage({ initialSub }: CalculatorPageProps) {
   }, [typeId]);
 
   useEffect(() => {
-    const payload = localStorage.getItem("reusePayload");
-    if (payload) {
-      try {
+    if (typeof window === "undefined") return;
+    try {
+      const payload = localStorage.getItem("reusePayload");
+      if (payload) {
         const parsed = JSON.parse(payload);
         if (parsed?.typeId) {
           setCurrentCalc(parsed.typeId);
@@ -43,9 +44,9 @@ export default function CalculatorPage({ initialSub }: CalculatorPageProps) {
             localStorage.removeItem("reusePayload");
           }, 100);
         }
-      } catch (e) {
-        console.error("再利用データの読み込みに失敗:", e);
       }
+    } catch (e) {
+      console.error("再利用データの読み込みに失敗:", e);
     }
   }, []);
 

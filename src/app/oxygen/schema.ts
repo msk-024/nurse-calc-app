@@ -7,7 +7,7 @@ export const oxygenSchema = z
       { errorMap: () => ({ message: "デバイスを選択してください" }) }
     ),
     flow: z.coerce
-      .number()
+      .number({ invalid_type_error: "流量を入力してください" })
       .min(0.5, "流量は0.5L/min以上で入力してください")
       .max(60, "流量は60L/min以下で入力してください")
       .optional(),

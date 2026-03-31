@@ -2,23 +2,20 @@
 
 import React from "react";
 
-interface LabeledSelectProps {
+interface LabeledSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: ReadonlyArray<{ value: string; label: string }>;
   error?: string;
 }
 
 const LabeledSelect = React.forwardRef<HTMLSelectElement, LabeledSelectProps>(
-  ({ label, value, onChange, options, error }, ref) => {
+  ({ label, options, error, className: _className, ...rest }, ref) => {
     return (
       <div>
         <label className="block text-base font-medium mb-2">{label}</label>
         <select
           ref={ref}
-          value={value}
-          onChange={onChange}
+          {...rest}
           className={`w-full border rounded-lg px-4 py-3 text-lg text-gray-900 bg-white focus:outline-none focus:ring-2 ${
             error ? "border-red-500 focus:ring-red-400" : "focus:ring-blue-400"
           }`}

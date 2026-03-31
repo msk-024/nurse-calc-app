@@ -1,14 +1,20 @@
 import { z } from "zod";
 
+const prep = (val: unknown) => (val === "" ? undefined : val);
+
 export const fluidSchema = z.object({
-  prevWeight: z.coerce
-    .number({ invalid_type_error: "前日体重を入力してください" })
-    .min(1, "前日体重は1kg以上で入力してください")
-    .max(300, "前日体重は300kg以下で入力してください"),
-  currWeight: z.coerce
-    .number({ invalid_type_error: "当日体重を入力してください" })
-    .min(1, "当日体重は1kg以上で入力してください")
-    .max(300, "当日体重は300kg以下で入力してください"),
+  prevWeight: z.preprocess(
+    prep,
+    z.coerce.number({ invalid_type_error: "前日体重を入力してください" })
+      .min(1, "前日体重は1kg以上で入力してください")
+      .max(300, "前日体重は300kg以下で入力してください")
+  ),
+  currWeight: z.preprocess(
+    prep,
+    z.coerce.number({ invalid_type_error: "当日体重を入力してください" })
+      .min(1, "当日体重は1kg以上で入力してください")
+      .max(300, "当日体重は300kg以下で入力してください")
+  ),
   oralIntake: z.coerce
     .number()
     .min(0, "経口摂取量は0以上で入力してください")

@@ -7,9 +7,9 @@ import LabeledSelect from "@/app/_components/LabeledSelect";
 import SubmitButton from "@/app/_components/SubmitButton";
 import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { dripSchema, type DripInputs } from "./schema";
-import { useCalculator } from "@/hooks/useCalculator";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type ZodTypeAny } from "zod";
 import { useRef, useEffect, useState } from "react";
 import { getTypedReusePayloadOnce } from "@/lib/reuse/reuse";
 import { scrollToRef } from "@/lib/scrollToRef";
@@ -28,7 +28,7 @@ export default function DripCalculator() {
     reset,
     formState: { errors },
   } = useForm<DripInputs>({
-    resolver: zodResolver(dripSchema),
+    resolver: zodResolver(dripSchema as ZodTypeAny),
     defaultValues: { dropFactor: 20 },
   });
 

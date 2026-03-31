@@ -62,15 +62,15 @@ export default function OxygenCalculator() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <LabeledSelect
             label="デバイスを選択"
-            options={oxygenDevices.map((d) => ({
-              value: d.id,
-              label: d.name,
-            }))}
+            options={[
+              { value: "", label: "-- 選択してください --" },
+              ...oxygenDevices.map((d) => ({ value: d.id, label: d.name })),
+            ]}
             error={errors.deviceId?.message}
             {...register("deviceId")}
           />
 
-          {deviceId !== "room_air" && (
+          {deviceId && deviceId !== "room_air" && (
             <LabeledInput
               label="流量 (L/min)"
               type="number"

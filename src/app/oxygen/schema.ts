@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { oxygenDevices } from "@/config/oxygenDevices";
+
+// 流量入力が必要なデバイス（estimateFiO2Functionを持つもの）
+const devicesRequiringFlow = oxygenDevices
+  .filter((d) => d.estimateFiO2Function)
+  .map((d) => d.id);
 
 export const oxygenSchema = z
   .object({
@@ -15,7 +21,7 @@ export const oxygenSchema = z
         .optional()
     ),
   })
-  .refine((data) => data.deviceId === "room_air" || data.flow != null, {
+  .refine((data) => !devicesRequiringFlow.includes(data.deviceId) || data.flow != null, {
     message: "このデバイスでは流量の入力が必須です",
     path: ["flow"],
   });

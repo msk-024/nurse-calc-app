@@ -17,11 +17,8 @@ export default function OxygenCalculator() {
     resultRef,
     register,
     handleSubmit,
-    watch,
     errors,
   } = useCalculator<OxygenInputs>(oxygenSchema, "oxygen");
-
-  const deviceId = watch("deviceId");
 
   const onSubmit = (data: OxygenInputs) => {
     const selectedDevice = oxygenDevices.find((d) => d.id === data.deviceId);
@@ -70,15 +67,13 @@ export default function OxygenCalculator() {
             {...register("deviceId")}
           />
 
-          {deviceId && deviceId !== "room_air" && (
-            <LabeledInput
-              label="流量 (L/min)"
-              type="number"
-              placeholder="例: 2"
-              error={errors.flow?.message}
-              {...register("flow")}
-            />
-          )}
+          <LabeledInput
+            label="流量 (L/min)"
+            type="number"
+            placeholder="例: 2"
+            error={errors.flow?.message}
+            {...register("flow")}
+          />
         </div>
 
         <SubmitButton color="bg-teal-500" />

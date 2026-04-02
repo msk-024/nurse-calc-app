@@ -31,7 +31,7 @@ export default function CalcButton({
         compact ? "w-full h-16" : "w-40 h-16 md:w-full",
         "relative flex items-center justify-center gap-2 rounded-lg font-semibold text-white tracking-widest",
         "transition-all duration-150 will-change-[box-shadow,filter]",
-        "select-none touch-none",
+        "select-none touch-manipulation",
         calc.color,
 
         !active &&

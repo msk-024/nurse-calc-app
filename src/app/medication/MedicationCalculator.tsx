@@ -8,9 +8,14 @@ import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { medicationSchema, type MedicationInputs } from "./schema";
 import { useCalculator } from "@/hooks/useCalculator";
 
+type MedicationResult = {
+  totalDose: string;
+  volume: string;
+};
+
 export default function MedicationCalculator() {
   const { result, setResult, resultRef, register, handleSubmit, errors } =
-    useCalculator<MedicationInputs>(medicationSchema, "medication");
+    useCalculator<MedicationInputs, MedicationResult>(medicationSchema, "medication");
 
   const onSubmit = (data: MedicationInputs) => {
     const totalDose = data.weight * data.dose;

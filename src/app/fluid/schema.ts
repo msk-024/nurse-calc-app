@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const prep = (val: unknown) => (val === "" ? undefined : val);
+import { prep } from "@/lib/zodHelpers";
 
 export const fluidSchema = z.object({
   prevWeight: z.preprocess(

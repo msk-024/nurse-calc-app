@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { patientConditions } from "@/config/patientConditions";
-
-const prep = (val: unknown) => (val === "" ? undefined : val);
+import { prep } from "@/lib/zodHelpers";
 
 export const nutritionSchema = z.object({
   weight: z.preprocess(

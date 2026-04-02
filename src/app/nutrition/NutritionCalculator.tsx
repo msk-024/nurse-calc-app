@@ -11,9 +11,16 @@ import { patientConditions } from "@/config/patientConditions";
 import { nutritionSchema, type NutritionInputs } from "./schema";
 import { useCalculator } from "@/hooks/useCalculator";
 
+type NutritionResult = {
+  calorie: string;
+  protein: string;
+  water: string;
+  condition: string;
+};
+
 export default function NutritionCalculator() {
   const { result, setResult, resultRef, register, handleSubmit, errors } =
-    useCalculator<NutritionInputs>(nutritionSchema, "nutrition");
+    useCalculator<NutritionInputs, NutritionResult>(nutritionSchema, "nutrition");
 
   const onSubmit = (data: NutritionInputs) => {
     const factor =

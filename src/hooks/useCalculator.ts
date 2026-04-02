@@ -9,7 +9,7 @@ import { scrollToRef } from "@/lib/scrollToRef";
 
 type SubType = "na" | "k" | "mg";
 
-interface UseCalculatorReturn<TInputs extends Record<string, any>, TResult = any> {
+interface UseCalculatorReturn<TInputs extends Record<string, any>, TResult = string> {
   result: TResult | null;
   setResult: (result: TResult) => void;
   resultRef: React.RefObject<HTMLDivElement | null>;
@@ -37,7 +37,7 @@ interface UseCalculatorReturn<TInputs extends Record<string, any>, TResult = any
  */
 export function useCalculator<
   TInputs extends Record<string, any>,
-  TResult = any
+  TResult = string
 >(
   schema: ZodTypeAny,
   typeId: string,

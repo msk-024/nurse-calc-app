@@ -14,7 +14,7 @@ export const oxygenDevices: OxygenDevice[] = [
     name: "鼻カニュラ",
     flowRange: "1〜6 L/min",
     fio2Range: "約24〜44%",
-    estimateFiO2Function: (flow: number) => Math.min(24 + (flow - 1) * 4, 44), // 1L 24%, +4%/L
+    estimateFiO2Function: (flow: number) => Math.min(24 + Math.max(0, flow - 1) * 4, 44), // 1L 24%, +4%/L
   },
   {
     id: "simple_mask",
@@ -46,5 +46,3 @@ export const oxygenDevices: OxygenDevice[] = [
   },
 ];
 
-// 推定式（簡易的な目安） PaO2 ≒ SpO2 * 1.25
-export const estimatePaO2 = (spo2: number) => (spo2 >= 90 ? (spo2 - 30) * 1.5 : null);

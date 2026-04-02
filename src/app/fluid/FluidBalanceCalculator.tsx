@@ -7,9 +7,16 @@ import { ResultBox } from "@/app/_components/ResultBox/ResultBox";
 import { fluidSchema, type FluidInputs } from "./schema";
 import { useCalculator } from "@/hooks/useCalculator";
 
+type FluidResult = {
+  weightChange: string;
+  fluidBalance: string;
+  estimatedFluid: string;
+  status: string;
+};
+
 export default function FluidBalanceCalculator() {
   const { result, setResult, resultRef, register, handleSubmit, errors } =
-    useCalculator<FluidInputs>(fluidSchema, "fluid");
+    useCalculator<FluidInputs, FluidResult>(fluidSchema, "fluid");
 
   const onSubmit = (data: FluidInputs) => {
     const oral = data.oralIntake ?? 0;

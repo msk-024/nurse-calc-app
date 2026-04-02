@@ -36,7 +36,7 @@ export default function DripCalculator() {
     const data = getTypedReusePayloadOnce("drip", dripSchema);
     if (!data) return;
     reset(data);
-  }, [reset]);
+  }, [reset, dripSchema]);
 
   useEffect(() => {
     if (result) scrollToRef(resultRef);

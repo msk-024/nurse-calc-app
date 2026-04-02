@@ -16,7 +16,6 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useMemo } from "react";
 import SortableButton from "./SortableButton";
 import { calculators } from "@/config/calculators";
 
@@ -35,14 +34,10 @@ export default function SortableCalcList({
   onSelect,
   onSorted,
 }: SortableCalcListProps) {
-  const calculatorsWithStringId = useMemo(
-    () =>
-      calculators.map((c) => ({
-        ...c,
-        id: String(c.id),
-      })),
-    [calculators],
-  );
+  const calculatorsWithStringId = calculators.map((c) => ({
+    ...c,
+    id: String(c.id),
+  }));
 
   const sensors = useSensors(
     // 長押しで選択ボタンが出てこないように。

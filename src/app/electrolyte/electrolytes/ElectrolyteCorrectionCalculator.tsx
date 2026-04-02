@@ -9,7 +9,6 @@ export default function ElectrolyteCorrectionCalculator() {
 
   useEffect(() => {
       const reuse = getReusePayload();
-      console.log("Hydration後に読み込んだ reusePayload:", reuse);
       if (
         reuse?.typeId === "electrolyte" &&
         (reuse.sub === "na" || reuse.sub === "k")

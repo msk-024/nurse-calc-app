@@ -11,8 +11,6 @@ type HistoryListProps = {
 
 export default function HistoryList({ items }: HistoryListProps) {
   const handleReuse = (h: HistoryItem) => {
-    console.log("再利用payload保存完了:", h);
-
     setReusePayload({
       typeId: h.typeId,
       sub: h.sub,

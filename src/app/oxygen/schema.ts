@@ -1,19 +1,21 @@
 import { z } from "zod";
 import { oxygenDevices } from "@/config/oxygenDevices";
+import { prep } from "@/lib/zodHelpers";
 
 // 流量入力が必要なデバイス（estimateFiO2Functionを持つもの）
 const devicesRequiringFlow = oxygenDevices
   .filter((d) => d.estimateFiO2Function)
   .map((d) => d.id);
 
+const deviceIds = oxygenDevices.map((d) => d.id) as [string, ...string[]];
+
 export const oxygenSchema = z
   .object({
-    deviceId: z.enum(
-      ["room_air", "nasal_cannula", "simple_mask", "reservoir_mask", "venturi_mask", "hfnc"],
-      { errorMap: () => ({ message: "デバイスを選択してください" }) }
-    ),
+    deviceId: z.enum(deviceIds, {
+      errorMap: () => ({ message: "デバイスを選択してください" }),
+    }),
     flow: z.preprocess(
-      (val) => (val === "" ? undefined : val),
+      prep,
       z.coerce
         .number({ invalid_type_error: "流量を入力してください" })
         .min(0.5, "流量は0.5L/min以上で入力してください")

@@ -46,7 +46,7 @@ export default function SortableButton({
       style={style}
       {...attributes}
       {...listeners}
-      className="w-full"
+      className="w-full touch-none"
     >
       <CalcButton calc={calc} active={active} onClick={onClick} compact />
     </div>

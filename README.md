@@ -6,6 +6,10 @@
 **デモ：[こちらからお試しできます](https://nurse-calc-app.vercel.app)** 
 
 
+## 🔗 Links
+- [📘 Zenn（開発背景・UI/UX解説）](https://zenn.dev/moch1/articles/d9d8454697d1fe)
+- [🧠 Qiita（技術解説）](https://qiita.com/amocode024/items/49db6b58b55a405904c1)
+
 ---
 
 ## 🚀 主な特徴
